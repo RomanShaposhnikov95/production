@@ -1,0 +1,74 @@
+Мы прикрутим реакт!
+
+Вводим команду в терминале npm i react react-dom.
+Обратите внимание что их мы усанавдиваем как реальные зависимости!
+
+Так же нужно установить типы: npm i -D @types/react @types/react-dom
+Заметь что типы мы устанавливаем уже как dev зависимости!!!
+
+
+React использует jsx но так как мы используме loader tsx, то он уже умеет обрабатывать jsx. Если же мы писали бы на нативном js
+то в этом случае нужен был бы babel-loader
+
+1. На данном этапе можем удалит файл test.ts из папки src.
+Теперь в файл index.tsx в папке src мы меняем расшерение на .tsx и теперь он выглядет так:
+
+import {render} from "react-dom";
+
+
+render(
+    <div>fewfefef</div>,
+    document.getElementById('root')
+)
+
+
+но typescript ругается что мы не импортируем React (React refers to a UMD global, but the current file is a module. Consider adding an import instead.)
+, но это не нормально потому что мы используем уже новую версию react. Для этого нам нужно зайти tsconfig.json и там
+заменить  "jsx": "react" на  "jsx": "react-jsx". Ошибка долдна пропасть!
+
+Проверям что сборка работает и прописывам npm start! Все должно работать!
+
+Для проверки react можем создать компоненту, например counter в папке src
+
+    import React, {useState} from 'react';
+
+    export const Counter = () => {
+        const [count, setCount] = useState(0)
+
+        const increment = () => {
+            setCount(count + 1)
+        }
+
+        return (
+            <div>
+                <div>{count}</div>
+                <button onClick={increment}>increment</button>
+            </div>
+        );
+    };
+
+импортируем его в index.tsx и видем что все работает!
+
+Но не все так гладко. На данный момент мы не можем импортировать css в компоненты так как у нас нет loader
+который мог бы обрабатывать css!
+
+Мы гуглим webpack scss так как мы будем еще использовать препроцессоры!
+По первой ссылке, по туториалу смотрим и там нужно ввести команду:
+npm install sass-loader sass webpack --save-dev
+но в скрипте отсуствуют style-loader и css-loader поэтому добавляем плюсом
+npm install sass-loader sass webpack style-loader css-loader --save-dev.
+
+После установки из туториала копируем правило и добавляем его в файл buildLoaders.ts
+
+    const cssLoader =  {
+        test: /\.s[ac]ss$/i,
+        use: [
+            "style-loader",
+            "css-loader",
+            "sass-loader",
+        ],
+    }
+
+Для проаерки создаем scss файл назовем его counter.scss и вызовем в компоненте и увидем что все работает как надо!
+Но обрати внимание что работает только scss а не css так как мы установили в loader scss
+

@@ -1,0 +1,183 @@
+Теперь, после внесения изменений, они не будут отображаться в браузере, пока мы заново не выполним сборку.
+Для этого нам нужно установить dev server.
+
+Сначало гуглим webpack dev server, и переходим по первой ссылке.
+ Затем в файл buildWebpackConfig.ts добавляем следующие изменения "devtool: 'inline-source-map",
+ чтобы видеть, где произошла ошибка:
+
+ export function buildWebpackConfig(options: BuildOptions): webpack.Configuration {
+     const {paths, mode} = options;
+     return {
+         mode: mode,
+         entry: paths.entry,
+         output: {
+             filename: '[name].[contenthash].js',
+             path: paths.build,
+             clean: true,
+         },
+         plugins: buildPlugins(options),
+         module: {
+             rules: buildLoaders()
+         },
+         resolve: buildResolvers(),
+         devtool: 'inline-source-map', /// Добавляем для отображения ошибок +++
+         devServer: buildDevServer(options) /// Добавляем DevServer +++ создадим смотреть ниже
+     }
+ }
+
+Дальше по туториалу нам предлагается 3 способа
+
+  1) webpack's Watch Mode
+  2) webpack-dev-server
+  3) webpack-dev-middleware
+
+Мы выбираем второй способ, так как он полностью соответствует нашим потребностям.
+
+И Устанавливаем его с помощью команды: npm install --save-dev webpack-dev-server @types/webpack-dev-server
+
+В папке config/build создаем новый файл buildDevServer.ts:
+
+ import {BuildOptions} from "./types/config";
+ import type { Configuration as DevServerConfiguration} from 'webpack-dev-server';
+
+
+ export function buildDevServer(options: BuildOptions): DevServerConfiguration {
+     return {
+         port: options.port,
+         open: true // чтобы открывать нашу страницу
+     }
+ }
+
+ так же нужно добавить options.port в webpack.config.ts
+
+     const paths: BuildPaths = {
+         entry: path.resolve(__dirname, 'src', 'index.tsx'),
+         build: path.resolve(__dirname, 'build'),
+         html: path.resolve(__dirname, 'public', 'index.html')
+     }
+
+     const mode = 'development'
+
+     const isDev = mode === 'development';
+
+     const PORT = 3000; // ++
+
+     const config: webpack.Configuration = buildWebpackConfig({
+         mode: mode,
+         paths,
+         isDev,
+         port: PORT // ++
+     });
+
+     export default config;
+
+ и в типы и
+
+     export type BuildMode = 'production' | 'development';
+
+     export interface BuildPaths {
+         entry: string;
+         build: string;
+         html: string;
+     }
+
+     export interface BuildOptions {
+         mode: BuildMode;
+         paths: BuildPaths;
+         isDev: boolean;
+         port: number; //++
+     }
+
+ И чтобы зарустить server открываем package.json  и меняем эту часть
+
+  "scripts": {
+     "test": "echo \"Error: no test specified\" && exit 1"
+   },
+
+   На:
+
+  "scripts": {
+    "start": "webpack serve"
+  },
+
+
+  И теперь прописав npm start все работает!!!
+
+
+  Следущим этапом хотелось бы динамически менять виды сборок development/production. Мы гугли webpack env variables и первая ссылка
+
+  и меняем в package.json эту часть
+
+      "scripts": {
+        "start": "webpack serve --env port=3000",
+        "build:prod": "webpack --env mode=production",
+        "build:dev": "webpack --env mode=development"
+      },
+
+
+    Теперь нам нужно достать как то данные из терминала в код в зависимости что мы вводим например start:dev или start:prod
+
+    Мы просто меняем в файле webpack.config.ts эту часть:
+
+        export default config;
+
+        на:
+
+        export default (env: BuildEnv) => {
+
+            const paths: BuildPaths = {
+                entry: path.resolve(__dirname, 'src', 'index.tsx'),
+                build: path.resolve(__dirname, 'build'),
+                html: path.resolve(__dirname, 'public', 'index.html')
+            }
+
+            const mode = env.mode  || 'development'
+            const PORT = env.port || 3000;
+            const isDev = mode === 'development';
+
+            const config: webpack.Configuration = buildWebpackConfig({
+                mode,
+                paths,
+                isDev,
+                port: PORT
+            });
+
+            return config;
+        }
+
+ Заметь! что мы все содержимое webpack.config.ts перенесли во внутрь функции, это для того чтоб мы могли получить env
+
+  Так же в типы добваляем новый тип BuildEnv
+
+        export type BuildMode = 'production' | 'development';
+
+        export interface BuildPaths {
+            entry: string;
+            build: string;
+            html: string;
+        }
+
+        export interface BuildEnv {
+            mode: BuildMode;
+            port: number;
+        } // ++++++
+
+        export interface BuildOptions {
+            mode: BuildMode;
+            paths: BuildPaths;
+            isDev: boolean;
+            port: number;
+        }
+
+
+Теперь, когда вы вводите команду npm run build:dev, выполняется сборка в режиме development,
+а команда npm run build:prod запускает сборку в режиме production.
+
+так же желательно чтоб в production версии убрать комментарии и source maps, в файле buildWebpackConfig.ts пункт
+
+   devtool: isDev ? 'inline-source-map' : undefined,
+   devServer: isDev ? buildDevServer(options) : undefined
+
+   сделаем такими!!!!
+
+   Теперь всё готово для гибкого переключения между режимами разработки и продакшн!

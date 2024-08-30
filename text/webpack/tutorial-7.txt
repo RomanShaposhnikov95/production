@@ -1,0 +1,184 @@
+создаем в src папку styles и перетаскиваем в нее index.scss
+
+index.scss теперб выглядет так:
+
+    .app {
+      font-size: 30px;
+    }
+
+создаем в папке styles файл reset.scss
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    input,
+    button,
+    textarea,
+    select {
+      margin: 0;
+
+      font: inherit;
+    }
+
+создаем в папке styles две папки
+
+1) themes
+    внути создаем два файла
+        dark.scss
+            .app.dark {
+              --bg-color: #0e0e75;
+
+              --primary-color: #049604;
+              --secondary-color: #04ff04;
+            }
+
+        normal.scss
+
+            .app.light {
+              --bg-color: #e8e8ea;
+
+              --primary-color: #041c65;
+              --secondary-color: #0449e0;
+            }
+
+2) variables
+ внути создаем файл
+     global.scss
+
+     и выглядет он так:
+
+        :root {
+          --font-family-main: Consolas, "Times New Roman", Serif;
+
+          --font-size-m: 16px;
+          --font-line-m: 24px;
+          --font-m: var(--font-size-m) / var(--font-line-m) var(--font-family-main);
+
+          --font-size-l: 24px;
+          --font-line-l: 32px;
+          --font-l: var(--font-size-l) / var(--font-line-l) var(--font-family-main);
+        }
+
+в index.scss импортируем все:
+
+    @import "reset";
+    @import "variables/global";
+    @import "themes/normal";
+    @import "themes/dark";
+
+    .app {
+      font: var(--font-m);
+
+      background-color: var(--bg-color);
+      color: var(--primary-color);
+
+      min-height: 100vh;
+    }
+
+
+в src создаем папку theme в ней будет все что касается темы
+    а в ней три файла
+        1)ThemeContext
+
+            import {createContext} from "react";
+
+            export enum Theme {
+                LIGHT ='light',
+                DARK = 'dark'
+            }
+
+            export interface ThemeContextProps {
+                theme?: Theme;
+                setTheme?: (theme: Theme) => void;
+            }
+
+            export const ThemeContext = createContext<ThemeContextProps>({});
+
+            export const LOCAL_STORAGE_THEME_KEY = 'theme'
+
+        2)ThemeProvider
+
+            import React, {FC, PropsWithChildren, useMemo, useState} from 'react';
+            import {LOCAL_STORAGE_THEME_KEY, Theme, ThemeContext} from "./ThemeContext";
+
+
+            const defaultTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as Theme || Theme.LIGHT
+
+            const ThemeProvider: FC<PropsWithChildren> = ({children}) => {
+                const [theme, setTheme] = useState<Theme>(defaultTheme);
+
+                const defaultProps = useMemo(() => ({
+                    theme: theme,
+                    setTheme: setTheme
+                }),[theme])
+
+                return (
+                    <ThemeContext.Provider value={defaultProps}>
+                        {children}
+                    </ThemeContext.Provider>
+                );
+            };
+
+            export default ThemeProvider;
+
+        3)useTheme
+
+            import {LOCAL_STORAGE_THEME_KEY, Theme, ThemeContext} from "./ThemeContext";
+            import {useContext} from "react";
+
+            interface UseThemeResult {
+                toggleTheme: () => void;
+                theme: Theme;
+            }
+
+            export function useTheme(): UseThemeResult {
+                const {theme, setTheme} = useContext(ThemeContext);
+
+                const toggleTheme = () => {
+                    const newTheme = theme === Theme.DARK ? Theme.LIGHT : Theme.DARK
+                    setTheme(newTheme);
+                    localStorage.setItem(LOCAL_STORAGE_THEME_KEY, newTheme);
+                }
+
+                return {
+                    theme,
+                    toggleTheme
+                }
+            }
+
+
+После мы оборачиваем в ThemeProvider апликацию
+
+    <React.StrictMode>
+            <BrowserRouter>
+                <ThemeProvider>
+                    <App/>
+                </ThemeProvider>
+            </BrowserRouter>
+    </React.StrictMode>
+
+
+и вызываем хук в App.tsx
+
+    const App = () => {
+        const {theme, toggleTheme} = useTheme()
+
+        return (
+            <div className={`app ${theme}`}>
+                <button onClick={toggleTheme}>TOGGLE</button>
+                <Link to={'/'}>Главная</Link>
+                <Link to={'/about'}>О сайте</Link>
+                <Suspense fallback={<div>Loading....</div>}>
+                    <Routes>
+                        <Route path={'/about'} element={<AboutPageAsync/>}/>
+                        <Route path={'/'} element={<MainPageAsync/>}/>
+                    </Routes>
+                </Suspense>
+            </div>
+        );
+    };
+
+    export default App;

@@ -1,0 +1,41 @@
+делаем самодельный helper classNames
+
+
+
+type Mods = Record<string, boolean | string>
+
+export function classNames(cls: string, mods: Mods, additional: string[]): string {
+    return [
+        cls,
+        ...additional,
+        ...Object.entries(mods)
+            .filter(([className, value]) => Boolean(value))
+            .map(([className]) => className)
+    ]
+        .join(' ');
+}
+
+// classNames('remove-btn', {hovered: true, selectable: true, red: false}, ['pdg'])
+
+
+и вызываем его в App.tsx
+
+    const App = () => {
+        const {theme, toggleTheme} = useTheme()
+
+        return (
+            <div className={classNames('app', {}, [theme])}>
+                <button onClick={toggleTheme}>TOGGLE</button>
+                <Link to={'/'}>Главная</Link>
+                <Link to={'/about'}>О сайте</Link>
+                <Suspense fallback={<div>Loading....</div>}>
+                    <Routes>
+                        <Route path={'/about'} element={<AboutPageAsync/>}/>
+                        <Route path={'/'} element={<MainPageAsync/>}/>
+                    </Routes>
+                </Suspense>
+            </div>
+        );
+    };
+
+    export default App;

@@ -1,0 +1,105 @@
+Проект становится больше, и поэтому правильно будет организовать структуру файлов, распределив их по папкам.
+1. Для начала создаем папку config, а в ней — три папки:
+   build
+   eslint
+   jest
+
+В папке build мы будем описывать наши сценарии, разбивая их на части. Для начала создаем в этой
+папке файл buildPlugins.ts и переносим туда plugins из webpack.config.js, оформив их как
+отдельную функцию, которую будем вызывать в webpack.config.js:
+
+    export function buildPlugins(): webpack.WebpackPluginInstance[] { // webpack.WebpackPluginInstance[] тип из webpack
+        return [
+            new HtmlWebpackPlugin({
+                template: path.resolve(__dirname, 'public', 'index.html')
+            }),
+            new webpack.ProgressPlugin(),
+        ]
+    }
+
+Создаем файл buildLoaders.ts и переносим туда rules из webpack.config.js, также оформив их как отдельную функцию:
+
+    export function buildLoaders(): webpack.RuleSetRule[] {
+
+        const typescriptLoader =  {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            }
+
+        return [
+            typescriptLoader
+        ]
+    }
+
+Важно: Порядок loader имеет значение!
+
+
+Создаем файл buildResolvers.ts и переносим туда resolve из webpack.config.js в виде отдельной функции:
+
+    export function buildResolvers(): webpack.ResolveOptions {
+        return {
+            extensions: ['.tsx', '.ts', '.js'],
+        }
+    }
+
+Также создаем файл buildWebpackConfig.ts, в который переносим весь код из webpack.config.js в виде отдельной функции:
+
+    export function buildWebpackConfig(options: BuildOptions): webpack.Configuration {
+        const {paths, mode} = options;
+        return {
+            mode: mode,
+            entry: paths.entry,
+            output: {
+                filename: '[name].[contenthash].js',
+                path: paths.build,
+                clean: true,
+            },
+            plugins: buildPlugin(options),
+            module: {
+                rules: buildLoaders()
+            },
+            resolve: buildResolvers()
+        }
+    }
+
+
+Теперь webpack.config.js выглядит так:
+
+  const paths: BuildPaths = {
+      entry: path.resolve(__dirname, 'src', 'index.tsx'),
+      build: path.resolve(__dirname, 'build'),
+      html: path.resolve(__dirname, 'public', 'index.html')
+  }
+
+  const mode = 'development'
+
+  const isDev = mode === 'development'
+
+  const config: webpack.Configuration = buildWebpackConfig({
+      mode: mode,
+      paths,
+      isDev,
+  });
+
+  export default config;
+
+
+Также нужно добавить типы для конфигурации. Для этого создаем в папке config/build новую папку types и в ней файл config.ts:
+
+    export type BuildMode = 'production' | 'development';
+
+    export interface BuildPaths {
+        entry: string;
+        build: string;
+        html: string;
+    }
+
+    export interface BuildOptions {
+        mode: BuildMode;
+        paths: BuildPaths;
+        isDev: boolean;
+    }
+
+
+Теперь структура проекта упорядочена, а код легко поддерживать и масштабировать.

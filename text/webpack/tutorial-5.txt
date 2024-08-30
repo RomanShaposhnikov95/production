@@ -1,0 +1,204 @@
+Но теперь при сборке мы можем обнаружить что весь css хранится у нас в js виде, что не совсем правильно
+Нужно чтоб хранился в отдельном файле.
+Поэтому есть специальный плагин который называется MiniCssExtractPlugin
+Сначала по туториалу скопируем скрипт установки npm install --save-dev mini-css-extract-plugin
+1. В файлк buildPlugins.ts мы добавляе minicssPlugin
+
+export function buildPlugins({paths}:BuildOptions): webpack.WebpackPluginInstance[] {
+    return [
+        new HtmlWebpackPlugin({
+            template: paths.html
+        }),
+        new webpack.ProgressPlugin(),
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].[contenthash:8].css', /// +++
+            chunkFilename: 'css/[name].[contenthash:8].css' /// +++ что бы разбивать на чанки
+        }) /// +++
+    ]
+}
+
+Затем в buildLoader мы меняем:
+
+        const cssLoader =  {
+            test: /\.s[ac]ss$/i,
+            use: [
+                "style-loader",
+                "css-loader",
+                "sass-loader",
+            ],
+        }
+
+       на
+
+          const cssLoader =  {
+               test: /\.s[ac]ss$/i,
+               use: [
+                   MiniCssExtractPlugin.loader,
+                   "css-loader",
+                   "sass-loader",
+               ],
+           }
+
+То есть просто заменили "style-loader", на  MiniCssExtractPlugin.loader,
+
+Теперь выполнив сборку мы увидем что из js файла пропали стили и создалась отдельно css папка.
+
+теперь возникает вопрос нужно ли нам генерировать css файла на этапе разработки. Я думаю нет!
+Поэтому даелаем  в файле buildLoaders.ts так
+
+    export function buildLoaders(options: BuildOptions): webpack.RuleSetRule[] {
+
+        const cssLoader =  {
+            test: /\.s[ac]ss$/i,
+            use: [
+                options.isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                "css-loader",
+                "sass-loader",
+            ],
+        }
+
+        const typescriptLoader =  {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+        }
+
+        return [
+            typescriptLoader,
+            cssLoader
+        ]
+    }
+
+
+
+2. Теперь будем переделывать наши стили на модули! Для начала мы переминуем Counter.module.scss
+
+    import React, {useState} from 'react';
+    import classes from './Counter.module.scss'
+
+
+    export const Counter = () => {
+        const [count, setCount] = useState(0)
+
+        const increment = () => {
+            setCount(count + 1)
+        }
+
+        return (
+            <div className={classes.button}>
+                <div>{count}</div>
+                <button onClick={increment}>increment</button>
+            </div>
+        );
+    };
+
+
+Теперь нужно настроить модули в webpack. Сначала гуглим webpack css modules. Первая ссылка!
+
+По туториалу мы меняем в файле buildLoaders.ts
+        const cssLoader =  {
+            test: /\.s[ac]ss$/i,
+            use: [
+                options.isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                "css-loader",
+                "sass-loader",
+            ],
+        }
+
+        на
+
+             const cssLoader =  {
+                    test: /\.s[ac]ss$/i,
+                    use: [
+                        options.isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                        {
+                            loader: "css-loader",
+                            options: {
+                               modules: {
+                                   auto: (resPath: string) => Boolean(resPath.includes('.module')),
+                                   localIdentName: isDev ? '[path][name]__[local]--[hash:base64:5]' : '[hash:base64:8]',
+                                    namedExport: false, // Это проблема связана с обновлением css-loader
+                               },
+                            }
+                        },
+                        "sass-loader",
+                    ],
+                }
+
+
+Но мы можем заметить что typescript ругается import classes from './Counter.module.scss' -
+( Cannot find module ./Counter.module.scss or its corresponding type declarations)
+
+Поэтому гуглим css modules typescript и первая ссылка stackoverflov в src создаем файл global.d.ts
+и добавляем
+
+    declare module '*.scss' {
+        interface IClassNames {
+            [className: string]: string
+        }
+        const classNames: IClassNames;
+        export = classNames;
+    }
+
+
+Следуший шаг это в src папке создать App.tsx
+
+    import React from 'react';
+    import {Counter} from "./components/Counter";
+
+    const App = () => {
+        return (
+            <div>
+                <Counter/>
+            </div>
+        );
+    };
+
+    export default App;
+
+
+A index.tsx теперь выглядет так:
+
+    import {render} from "react-dom";
+    import App from "./App";
+
+
+    render(
+        <App/>,
+        document.getElementById('root')
+    )
+
+Теперь в src создадим index.scss файл с глобальными стилями и мы хотим чтоб это файл
+распростронялся на все приложение,мы не хотим его изолировать
+
+Для примера он выглядет так:
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .app {
+      font-size: 30px;
+    }
+
+
+вызываем стили в App.tsx
+
+    import React from 'react';
+    import {Counter} from "./components/Counter";
+    import './index.scss'
+
+    const App = () => {
+        return (
+            <div className="app">
+                Hello world
+                <Counter/>
+            </div>
+        );
+    };
+
+    export default App;
+
+Npm start и проверяем что все работает!

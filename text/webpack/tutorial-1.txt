@@ -1,0 +1,264 @@
+1. Сначала инициализируем проект npm init -y
+2. После создаем папку src а в ней файл index.tsx и test.ts
+3. В файле test.ts создаем рандомную функцию, а затем вызываем ее в index.tsx
+4. Но без специальных настроек экспорт и импорт работать не будут, здесь на помощь приходит webpack
+5. Потому устанавливаем webpack , сыылка на туториал (https://webpack.js.org/guides/getting-started/)
+6. Сначала мы прописываем команду npm install webpack webpack-cli --save-dev
+7. Обрати внимание что устанавливаем webpack только как dev зависимость потому что они участвуют только на этапе разработки
+8. В webpack tutorial советуется создать файл в корне webpack.config.ts
+9. В файл webpack.config.ts мы добавляем такую конструкцию:
+
+    const path = require('path');
+
+    module.exports = {
+      entry: './src/index.tsx',
+      output: {
+        filename: 'main.js',
+        path: path.resolve(__dirname, 'dist'),
+      },
+    };
+￼
+Но так как на разных операционнках пути работают по разному мы используем такой подход
+
+    const path = require('path');
+
+    module.exports = {
+      entry: path.resolve(__dirname, 'src', 'index.tsx'), //делаем такой путь для стартовой точки нашего приложения
+      output: {
+        filename: 'bundle.js' //как назовем сборку
+        path: path.resolve(__dirname, 'build'), //путь где будет сборка
+      }, //это настроки того куда и как мы будем делать сборку нашего приложения
+    };
+
+10. Запускаем сборку происав команду webpack
+11. Сборка произошла! Но выпал warning, что не указан mode, пожтому добовляем mode
+
+    const path = require('path');
+
+    module.exports = {
+    mode: 'development', //или 'production' - в development режиме все развернуто в сборке, а в production кратко!
+      entry: path.resolve(__dirname, 'src', 'index.tsx'),
+      output: {
+        filename: 'bundle.js'
+        path: path.resolve(__dirname, 'build'),
+      },
+    };
+
+12. Мы так же можем кешировать названия
+
+    const path = require('path');
+
+    module.exports = {
+    mode: 'development',
+      entry: {
+        RANDOM: path.resolve(__dirname, 'src', 'index.tsx'),
+      } здесь используме такую структуру, Вместо RANDOM может быть абсолютно любое название
+      output: {
+        filename: '[name].js' //- здесь берем в квадратные скобки
+        path: path.resolve(__dirname, 'build'),
+      },
+    };
+
+и теперь в сборке будет файл RANDOM.js но в нашем случае это не нужно так как
+у нас один entrypoint поэтому возвращаем как было но меняем filename чтоб решить ситуацию с кэшом
+
+const path = require('path');
+
+    module.exports = {
+    mode: 'development',
+      entry: path.resolve(__dirname, 'src', 'index.tsx'),
+      output: {
+        filename: '[name].[contenthash].js'
+        path: path.resolve(__dirname, 'build'),
+        clean: true, // - добавляем чтоб из папки build удалялось все не нужное
+      },
+    };
+
+13. Создаем папку public а в ней файл index.html это будет корневой файл откуда у нас будет начинаться приложение!
+В body добавляем <div id="root"></div>
+
+14. Теперь вебпаку нужно сообщить где html файл лежит и научить работать с ним для этого нужно
+установить плагин npm install --save-dev html-webpack-plugin
+
+15. Нужно добавить plugin в config
+
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin'); //+
+
+module.exports = {
+    mode: 'development',
+    entry: path.resolve(__dirname, 'src', 'index.tsx'),
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'build'),
+        clean: true,
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+                    template: path.resolve(__dirname, 'public', 'index.html') // путь до html
+                }),
+    ], //+
+};
+
+16. Можно по желанию добавить возможность отслеживания в процентах сборку new webpack.ProgressPlugin(); он идет по default
+в пакете webpack
+
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack')
+
+module.exports = {
+    mode: 'development',
+    entry: path.resolve(__dirname, 'src', 'index.tsx'),
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'build'),
+        clean: true,
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, 'public', 'index.html')
+        }),
+        new webpack.ProgressPlugin(),
+    ],
+};
+
+17. Сборка начинает разрастаться нужно все перевести на тайпскрипт (Гуглим webpack typescript)
+устанавливаем npm install --save-dev typescript ts-loader
+
+18. По туториалу мы должны создать в корне файл tsconfig.json и поменять index.js и test.js файлы на ts и для проверки в файле test
+нужно прокинуть какието тайприпт аргументы
+
+19. В tsconfig.json мы добавим следущее по туториалу:
+
+    {
+      "compilerOptions": {
+        "outDir": "./dist/",
+        "noImplicitAny": true,
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": true,
+        "moduleResolution": "node"
+      }
+    }
+
+20. В файле webpack.config.ts меняем js пути на ts
+
+    module.exports = {
+        mode: 'development',
+        entry: path.resolve(__dirname, 'src', 'index.tsx'), ///'index.tsx' а было 'index.js'
+        output: {
+            filename: '[name].[contenthash].js',
+            path: path.resolve(__dirname, 'build'),
+            clean: true,
+        },
+        plugins: [
+            new HtmlWebpackPlugin({
+                template: path.resolve(__dirname, 'public', 'index.html')
+            }),
+            new webpack.ProgressPlugin(),
+        ],
+    };
+
+21. Так же в webpack.config.ts по туториалу добавляем:
+
+    module.exports = {
+        mode: 'development',
+        entry: path.resolve(__dirname, 'src', 'index.tsx'),
+        output: {
+            filename: '[name].[contenthash].js',
+            path: path.resolve(__dirname, 'build'),
+            clean: true,
+        },
+        plugins: [
+            new HtmlWebpackPlugin({
+                template: path.resolve(__dirname, 'public', 'index.html')
+            }),
+            new webpack.ProgressPlugin(),
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: 'ts-loader',
+                    exclude: /node_modules/,  // это означает что node_modules не нужно чекать
+                },
+            ],
+        }, // +++ Это нужно чтоб обрабатывать файлы выходящие за рамки js то есть css, png, ts, jpeg, и т.д.
+        resolve: {
+            extensions: ['.tsx', '.ts', '.js'],
+        }, // +++ чтобы не указывать расшерение при импорте напимер Import component from ./components/Component
+        а не Import component from ./components/Component.ts
+    };
+
+И можно проверить что все работает в терминале прописываем webpack
+
+22. webpack.config.ts так же бы хотелось переделать на ts! Гуглим webpack config typescript и первая ссылка.
+ПО туториалу устанавливаем npm install --save-dev typescript ts-node @types/node @types/webpack
+Посде меняем webpack.config.ts на webpack.config.ts и чекаем сборку в терминале вводим webpack и все работает!!!
+
+23. Теперь в файле webpack.config.ts меняем все пути:
+
+    const path = require('path');
+    const HtmlWebpackPlugin = require('html-webpack-plugin');
+    const webpack = require('webpack')
+
+на:
+
+    import * as path from 'path';
+    import * as webpack from 'webpack';
+    import * as HtmlWebpackPlugin from "html-webpack-plugin";
+
+
+Так как import работает в тайприпт из под капота
+
+но мы не хотим использовать import * as и для этого в tsconfig.json добавляем
+пункт  "esModuleInterop": true и  "allowSyntheticDefaultImports": true,
+и теперь можно так
+
+import path from 'path';
+import webpack from 'webpack';
+import HtmlWebpackPlugin from "html-webpack-plugin";
+
+24. Для конфига создаем отдельнуб переменную и эксоптируем модуль по default:
+
+const config: webpack.Configuration = { // webpack.Configuration этот тип идет из webpack
+    mode: 'development',
+    entry: path.resolve(__dirname, 'src', 'index.tsx'),
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'build'),
+        clean: true,
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, 'public', 'index.html')
+        }),
+        new webpack.ProgressPlugin(),
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+    },
+};
+
+export default config;
+
+25. Но на данном этапе сборка не произойдет так как рушается на импорты и поэтому нужно добавить в файл tsconfig.json:
+
+    "ts-node": {
+        "compilerOptions": {
+          "module": "CommonJS"
+        }
+      }
+
+Теперь все работает!!!

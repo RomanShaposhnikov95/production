@@ -1,0 +1,96 @@
+Сейчас будеи устанавливать нафигацию на сайте
+
+для начала мы устанавливаем npm i react-router-dom и npm i -D @types/react-router-dom
+
+В index.tsx мы оборачиваем все в <BrowserRouter>
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(
+    <React.StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </React.StrictMode>
+);
+
+так же мы в src создаем папку pages и в ней две папки AboutPage и MainPage
+В каждой папаке по компоненте
+
+и добваляем все необходимое в App.tsx
+
+const App = () => {
+    return (
+        <div className="app">
+            <Link to={'/'}>Главная</Link>
+            <Link to={'/about'}>О сайте</Link>
+            <Routes>
+                <Route path={'/about'} element={<AboutPage/>}/>
+                <Route path={'/'} element={<MainPage/>}/>
+            </Routes>
+        </div>
+    );
+};
+
+export default App;
+
+Все! Навигация работает, но есть одно но! Что при перезагрузки вылетает ошибка Cannot GET /about
+Фиксится довольно легко! Открываем документацию https://github.com/webpack/webpack-dev-server
+
+И по докумениации открываем файл buildDevServer.ts и добовляем пункт historyApiFallback: true
+
+export function buildDevServer(options: BuildOptions): DevServerConfiguration {
+    return {
+        port: options.port,
+        open: true,
+        historyApiFallback: true // ++++
+    }
+}
+
+
+Теперб все работает!!! Но есть одно но при при загрузке станицы загружаются все разом! А нужно
+чтоб они загружались лишь когда зашел на на них. Для этого в react используется Suspense, Lazy
+
+Рассмотрим на примере
+
+Мы создадим файл AboutPage.async.tsx в папке AboutPage:
+
+    import {lazy} from "react";
+
+    export const AboutPageAsync = lazy(() => import('./AboutPage'));
+
+Аналогично MainPage
+
+    import {lazy} from "react";
+
+    export const MainPageAsync = lazy(() => import('./MainPage'));
+
+
+Примечание в import('./AboutPage')); будет падать ошибка, чтобы решить в tsconfig.json меняем  "module": "esnext",
+
+
+B импортируем их в App.tsx и оборачмвем в Suspense
+
+const App = () => {
+    return (
+        <div className="app">
+            <Link to={'/'}>Главная</Link>
+            <Link to={'/about'}>О сайте</Link>
+            <Suspense fallback={<div>Loading....</div>}>
+                <Routes>
+                    <Route path={'/about'} element={<AboutPageAsync/>}/>
+                    <Route path={'/'} element={<MainPageAsync/>}/>
+                </Routes>
+            </Suspense>
+        </div>
+    );
+};
+
+
+Теперь при сборке у наст есть 3 js файла а точнее чанка! На данный момент это избыточно, так как
+ чанки весят всего по 1 kb но по возрастанию это будет нужно!
+
+
+
+
+
