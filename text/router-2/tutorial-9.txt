@@ -1,0 +1,30 @@
+теперь нужно навести порядок в css для жтого нам нужен stylelint
+
+    npm install --save-dev stylelint stylelint-config-standard-scss
+
+далее следуя документации создаем в корне файл .stylelintrc.json
+
+   {
+     "extends": "stylelint-config-standard-scss",
+     "rules": {
+       "selector-class-pattern": null
+     }
+   }
+
+и чтобы линтер запустить выполняем команду npx stylelint "**/*.scss"
+и сразу добавляем ее в package.json
+
+    "lint:scss" : "npx stylelint \"**/*.scss\"",
+    "lint:scss:fix" : "npx stylelint \"**/*.scss\" --fix"
+
+
+Но мы не заметим никаких изменений пока в webstorm не включим stylelint
+настройки и в поиске вбиваем stylelint и там ставим checkbox на enabled и в строке run for files меняем css на scss
+теперь все работает и в стилях ошибки!
+
+
+Пофиксим еще одну проблему, написав рандомный текст в jsx разметке нужно чиоб ругался и предлагал перевод
+Гуглим i18n eslint и первая ссылка: npm install eslint-plugin-i18next --save-dev
+по туториалу добавляем i18next.configs['flat/recommended'],
+
+и теперт если у нас захардкоженный текст eslint будет рунаться
