@@ -1,0 +1,96 @@
+устанавливаем среду тестирования jest
+
+npm install --save-dev jest
+
+затем создаем конфиг для этого в терминале прописываем npm init jest@latest
+    Would you like to use Jest when running "test" script in "package.json"? Yes
+     Would you like to use Typescript for the configuration file? Yes
+    Choose the test environment that will be used for testing ?   jsdom (browser-like)
+    Do you want Jest to add coverage reports? no
+     Which provider should be used to instrument code for coverage? babel
+    Automatically clear mock calls, instances, contexts and results before every test? yes
+
+
+теперь в корне создан файл jes.config.ts и перетаскиваю его в папку config > jest
+Теперь в jes.config.ts мы раскоментруем эти пункты
+    clearMocks: true,
+      testEnvironment: 'jsdom',
+      coveragePathIgnorePatterns: [
+        '/node_modules/'
+      ],
+      moduleFileExtensions: [
+        'js',
+        'mjs',
+        'cjs',
+        'jsx',
+        'ts',
+        'tsx',
+        'json',
+        'node'
+      ],
+      moduleDirectories: [
+        'node_modules'
+      ],
+      testMatch: [
+        '<rootDir>src/**/*(*.)@(spec|test).[tj]s?(x)', // а этот пункт мы меняем на то что тут написанно
+      ],
+      rootDir: '../../',  // а этот пункт мы меняем на то что тут написанно
+
+
+Так как мы перенесли jes.config.ts в другую папку в package.json мы меняем эту команду "test": "jest"
+на "unit": "jest --config ./config/jest/jest.config.ts"
+
+следующим этапом напишем первый тест и первый прендидент это helper classNames
+
+в папке shared > lib > classNames мы создаем файл classNames.test.ts
+
+мы прописываем describe это обертка для все тестов но видем что у нас не работает describe
+для этого устанавливаем npm i --save-dev @types/jest
+
+    describe('classNames', () => {
+      test('test', () => {
+        expect(true).toBe(true);
+      });
+    }); // сам тест
+
+Теперь при npm run unit падает ошибка As of Jest 28 "jest-environment-jsdom" is no longer shipped by default, make sure to install it separately.
+Для этого утсанавливаем npm install -D jest-environment-jsdom
+
+Снова выполняем npm run unit и  смотрим что наш тест проходит
+
+
+Теперь тестим уже функцию classNames
+
+    import { classNames } from './classNames';
+
+    describe('classNames', () => {
+      test('test', () => {
+        expect(classNames('someClass')).toBe('someClass');
+      });
+    });
+
+И тест падает так как мы мспользуем typescript мы вводим команду npm install --save-dev @babel/preset-typescript
+
+устанавливаем babel:  npm install --save-dev babel-loader @babel/core
+                        npm install @babel/preset-env --save-dev
+
+B файл buildLoaders.ts
+
+      const babelLoader = {
+         test: /\.(js|jsx|tsx)$/,
+         exclude: /node_modules/,
+         use: {
+           loader: 'babel-loader',
+           options: {
+             presets: ['@babel/preset-env']
+           }
+         }
+       }
+
+Так же создаем файл babel.config.json
+
+    "presets": ["@babel/preset-env", "@babel/preset-typescript"]
+
+Теперь при npm run init все должно работать!
+
+
