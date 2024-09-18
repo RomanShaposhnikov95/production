@@ -1,0 +1,199 @@
+Будем делать мультиязычный сайт!
+Для этого будеи использовать библиотеку react-i18next.
+устанавливаем npm install react-i18next i18next --save
+В папке shared > config мы создаем папку i18n
+а в ней i18n.ts и встовляем в нее пример из документации
+
+    import i18n from 'i18next';
+    import { initReactI18next } from 'react-i18next';
+
+    import Backend from 'i18next-http-backend';
+    import LanguageDetector from 'i18next-browser-languagedetector';
+
+
+    i18n
+        .use(Backend)
+        .use(LanguageDetector)
+        .use(initReactI18next)
+        .init({
+            fallbackLng: 'ru',
+            debug: __IS_DEV__ ? true : false, ////? как это сделать
+
+            interpolation: {
+                escapeValue: false,
+            }
+        });
+
+
+    export default i18n;
+
+И также доутсанавливаем два пакета:
+    npm install i18next-http-backend i18next-browser-languagedetector --save
+
+
+Мы хотим прокинуть в файл i18n.ts проверку isDev но как на это сделать?
+Для этого нужно в файл buildPlugins.ts добавить
+    new webpack.DefinePlugin({
+
+    }) с помощью него можно прокидывать в приложение глобальные переменные!
+
+
+Гуглим DefinePlugin и по первой ссылке (webpack tutorial) переходим и по туториалу:
+
+     new webpack.DefinePlugin({
+        PRODUCTION: JSON.stringify(true),
+    })
+
+но вместо PRODUCTION можно использовать любое название и так же прокидывать разные значения
+
+     new webpack.DefinePlugin({
+          __IS_DEV__: JSON.stringify(isDev), // заменили на __IS_DEV__
+      })
+
+
+
+Но в файле i18n.ts на код __IS_DEV__ ? true : false ругается typescript так как config
+об этом ничего не значет и жля этого в src > app > types > global.d.ts
+добавляем эту константу:
+    declare const __IS_DEV__ : boolean;
+
+
+Отлично! двигаемся дальше!
+
+Возвращанмся к документациию. Конфигурацию мы добавили осталось ее импотироапть что бы языки начади работать.
+Для этого открываем index.ts файл и импортируем "import i18n from "shared/config/i18n/i18n";"
+
+
+    import React from 'react';
+    import ReactDOM from 'react-dom/client';
+    import App from "./app/App";
+    import {BrowserRouter} from "react-router-dom";
+    import {ThemeProvider} from "app/providers/ThemeProvider";
+
+    import "./shared/config/i18n/i18n"; /// ++++ но импортипуем наш конфиг!
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(
+        <React.StrictMode>
+            <BrowserRouter>
+                <ThemeProvider>
+                    <App/>
+                </ThemeProvider>
+            </BrowserRouter>
+        </React.StrictMode>
+    );
+
+
+По документации мы должны обернуть наш компоненты в suspense чтоб пепеволы подгружались чанками.
+Но это можно сделать раз в App.tsx
+
+    const App = () => {
+        const {theme, toggleTheme} = useTheme()
+
+        return (
+            <div className={classNames('app', {}, [theme])}>
+                <Suspense fallback="">
+                    <Navbar/>
+                    <div className="content-page">
+                        <Sidebar/>
+                         <AppRouter/>
+                    </div>
+                </Suspense>
+            </div>
+        );
+    };
+
+    export default App;
+
+Заметь что fallback="" это потому что переводы не должны весить много! точнее в нашем приложении, в обратном случае можно показывать loader
+
+создаем тестовый компонент и прокидываем его в App.tsx
+
+    const Component = () => {
+        const { t, i18n } = useTranslation();
+
+        const toggle = () => {
+            i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru') /// changeLanguage это функция из библиотеки i18n
+        }
+
+        return (
+            <div>
+                <button onClick={toggle}>{t('Перевод')}</button>
+                <div>{t('Тестовый перевод')}</div>
+            </div>
+        )
+    }
+
+
+    const App = () => {
+        const {theme, toggleTheme} = useTheme()
+
+        return (
+            <div className={classNames('app', {}, [theme])}>
+                <Suspense fallback="">
+                    <Navbar/>
+                    <Component/>
+                    <div className="content-page">
+                        <Sidebar/>
+                    </div>
+                    <AppRouter/>
+                </Suspense>
+            </div>
+        );
+    };
+
+
+Теперь возникает вопрос как это перевести и где хранить переводы?
+Опятьже мы ничего своего не придумываем! мы открываем документацию и там вы видем
+что в папке public мы сохдаем новую папку:
+
+    locales:
+        ru:
+            translation.json
+
+                {
+                  "Тестовый перевод": "Тестовый перевод",
+                  "Перевод": "Перевод"
+                }
+        en:
+            translation.json
+
+                {
+                  "Тестовый перевод": "Test translate",
+                  "Перевод": "Translate"
+                }
+
+
+Теперь все работает но мы можем заметить что при загрузке тянутся переводы со всех страниц
+а его так же можно подтягивать порциями.
+Для примера создадим в папках en и ru файл about.json
+    в en > about.json:
+        {
+          "О сайте": "About"
+        }
+
+    в ru > about.json:
+        {
+            "О сайте": "О сайте"
+        }
+
+И теперь в странице AboutPage.tsx:
+    const AboutPage = () => {
+        const { t } = useTranslation('about');  // мы добавили  'about' это значит что из файла about.json тянуть перевод.
+
+        return (
+            <div>
+                {t('О сайте')}
+            </div>
+        );
+    };
+
+    export default AboutPage;
+
+
+Выносим переключалку языков в отдельную компонету!
+
+Для удобства создавая новый перевод чтоб вручную не создавать клбчи в каждом языковом файле
+в webstorm есть plugin i18n support и теперь создовая новое слово оно будет зелененьки а не серым и мы нажимаем alt enter и
+там будет выбор создать во всех файлах!

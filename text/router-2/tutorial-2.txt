@@ -1,0 +1,15 @@
+в папке widgets создаем папку Navbar:
+   1)ui:
+        Navbar.tsx
+        Navbar.module.scss
+   2)index.tsx
+
+в папке shared создаем папку:
+  1)ui:
+       1)AppLink:
+           1)AppLink.module.scss,
+           2)AppLink.tsx
+
+ Затем исполтзуем созданную команенту в Navbar.tsx
+
+в видеоуроке в основном Работа со стилями!

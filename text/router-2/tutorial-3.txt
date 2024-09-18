@@ -1,0 +1,100 @@
+В папке src > shared создаем папку assets а в ней icons иконки
+
+Но импортируя эти файлы
+
+import LightIcon from 'shared/assets/icons/theme-light.svg';
+import DarkIcon from 'shared/assets/icons/theme-light.svg';
+
+мы сталкиваемся с проблемой что тайпскрипт ругается на svg! так как webpack не понимает что делать с этими файлами!
+
+Для этого в папаке config > build > buildLoaders.ts мы гуглим svgr loader webpack и там будет
+    npm install @svgr/webpack --save-dev
+
+И создаем обьект
+    const svgLoader = {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
+    }
+
+
+Но обратите внимаение что он обрабатывает только svg, а jpg,png и т.д. нет!
+
+Давайте это исправим!
+
+Гуглим webpack file loader и первая ссылка! По туториалу
+npm install file-loader --save-dev
+
+    import webpack from "webpack";
+    import MiniCssExtractPlugin from "mini-css-extract-plugin";
+    import {BuildOptions} from "./types/config";
+
+    export function buildLoaders({isDev}: BuildOptions): webpack.RuleSetRule[] {
+
+        const svgLoader = {
+            test: /\.svg$/,
+            use: ['@svgr/webpack'],
+        } // +++  для svg
+
+        const cssLoader =  {
+            test: /\.s[ac]ss$/i,
+            use: [
+                isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                {
+                    loader: "css-loader",
+                    options: {
+                        modules: {
+                            auto: (resPath: string) => Boolean(resPath.includes('.module.')),
+                            localIdentName: isDev ? '[path][name]__[local]' : '[hash:base64:8]',
+                            namedExport: false,
+                        },
+                    }
+                },
+                "sass-loader",
+            ],
+        }
+
+        const typescriptLoader =  {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+        }
+
+        const fileLoader = {
+            test: /\.(png|jpe?g|gif)$/i, // для шрифтов добовляем  test: /\.(png|jpe?g|gif|woff2|woff)$/i,
+            use: [
+                {
+                    loader: 'file-loader',
+                },
+            ],
+        } /// ++++  для png, jpg, и тд
+
+        return [
+            fileLoader,
+            svgLoader,
+            typescriptLoader,
+            cssLoader
+        ]
+    }
+
+Но мы все равно видем что typescript ругается поэтому гуглим svgr webpack typescript и там
+решение добавить в файл global.d.ts
+
+    declare module '*.scss' {
+        interface IClassNames {
+            [className: string]: string
+        }
+        const classNames: IClassNames;
+        export = classNames;
+    }
+
+    declare module "*.svg";
+    declare module "*.jpg";
+    declare module "*.jpeg";
+    declare module "*.svg" {
+        import React from "react";
+        const SVG: React.VFC<React.SVGProps<SVGSVGElement>>;
+        export default SVG;
+    }
+
+
+Теперь svg loader приобразовывает обычные svg в react комроненту например <DarkIcon/>
