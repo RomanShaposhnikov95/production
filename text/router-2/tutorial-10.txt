@@ -31,6 +31,9 @@ npm install --save-dev jest
       moduleDirectories: [
         'node_modules'
       ],
+        modulePaths: [
+          '<rootDir>src'
+        ], // чтобы можно было использовать абсолютные пути.
       testMatch: [
         '<rootDir>src/**/*(*.)@(spec|test).[tj]s?(x)', // а этот пункт мы меняем на то что тут написанно
       ],
