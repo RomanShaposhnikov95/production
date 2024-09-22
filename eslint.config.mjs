@@ -46,6 +46,11 @@ export default [
         },
       ], // Предупреждение для неиспользуемых переменных
       "@typescript-eslint/ban-ts-comment": "off",
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: 'import', next: 'function' },
+        { blankLine: 'always', prev: 'import', next: 'class' },
+      ],
     }
   },
 ];

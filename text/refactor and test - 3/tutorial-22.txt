@@ -1,0 +1,72 @@
+мы создаем ErrorBoundary
+В папке app > providers > ErrorBoundary > ui > ErrorBoundary.tsx
+    import React, { ErrorInfo, ReactNode, Suspense } from 'react';
+    import { ErrorPage } from 'widgets/ErrorPage/ui/ErrorPage';
+
+    interface ErrorBoundaryProps {
+        children: ReactNode;
+    }
+
+    interface ErrorBoundaryState {
+        hasError: boolean;
+    }
+
+    class ErrorBoundary
+        extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+        constructor(props: ErrorBoundaryProps) {
+            super(props);
+            this.state = { hasError: false };
+        }
+
+        static getDerivedStateFromError(error: Error) {
+            // Update state so the next render will show the fallback UI.
+            return { hasError: true };
+        }
+
+        componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+            // You can also log the error to an error reporting service
+            console.log(error, errorInfo);
+        }
+
+        render() {
+            const { hasError } = this.state;
+            const { children } = this.props;
+
+            if (hasError) {
+                // You can render any custom fallback UI
+                return (
+                    <Suspense fallback="">
+                        <ErrorPage />
+                    </Suspense>
+                );
+            }
+
+            return children;
+        }
+    }
+
+    export default ErrorBoundary;
+
+и оборачиваем index.tsx
+    import ReactDOM from 'react-dom/client';
+    import App from './app/App';
+    import { BrowserRouter } from 'react-router-dom';
+    import { ThemeProvider } from 'app/providers/ThemeProvider';
+
+    import './shared/config/i18n/i18n';
+    import { ErrorBoundary } from 'app/providers/ErrorBoundary';
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(
+      <React.StrictMode>
+        <BrowserRouter>
+          <ErrorBoundary>
+            <ThemeProvider>
+              <App/>
+            </ThemeProvider>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </React.StrictMode>
+    );
+
