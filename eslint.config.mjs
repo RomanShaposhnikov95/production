@@ -54,13 +54,9 @@ export default [
     }
   },
   {
-    overrides: [
-      {
-        files: ['**/src/**/*.test.{ts,tsx}'],
-        rules: {
-          'i18next/no-literal-string': 'off'
-        }
-      }
-    ] // что бы в тестах выключить eslint на неперведенные слова
-  }
+    files: ['**/src/**/*.test.{ts,tsx}'],
+    rules: {
+      'i18next/no-literal-string': 'off'
+    }
+  }// что бы в тестах выключить eslint на неперведенные слова
 ];
