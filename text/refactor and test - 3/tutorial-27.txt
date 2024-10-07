@@ -40,3 +40,70 @@
 
 
 После коммитим и пушим все изменения в git  "add main pipeline github actions"
+
+Далее меняем все на наши настройки
+
+    name: linting, testing, building
+    run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+    on:
+      push:
+        branches: [ main ]
+      pull_request:
+        branches: [ main ]
+    jobs:
+      pipeline:
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            node-version: [ 17.x ]
+
+        steps:
+          - uses: actions/checkout@v2
+          - name: Staring Node.js ${{ matrix.node-version }}
+            uses: actions/setup-node@v1
+            with:
+              node-version:  ${{ matrix.node-version }}
+          - name: install modules
+            run: npm install
+          - name: build production project
+            run: npm run build:prod
+          - name: linting typescript
+            run: npm run lint:ts
+          - name: linting css
+            run: npm run lint:scss
+          - name: unit testing
+            run: npm run test:unit
+
+М ы всегда можем эту настройку загунлить чтоб лучше пронять что тут происходит
+
+Далее заходим на github.com в наш проект и там переходим в actions
+И видим что у нас пошел процесс загрузки и видем что на этапе build production project бесконечная загрузка
+и для этоно отклбчаем bundleAnalyzer для production
+Для этого переходим в config > build > buildPlugins.ts
+и переделываем
+    export function buildPlugins ({ paths, isDev }:BuildOptions): webpack.WebpackPluginInstance[] {
+      const plugins = [
+        new webpack.ProgressPlugin(),
+        new HtmlWebpackPlugin({
+          template: paths.html
+        }),
+        new MiniCssExtractPlugin({
+          filename: 'css/[name].[contenthash:8].css',
+          chunkFilename: 'css/[name].[contenthash:8].css'
+        }),
+        new webpack.DefinePlugin({
+          __IS_DEV__: JSON.stringify(isDev),
+        }),
+      ]
+
+      if (isDev) {
+        plugins.push(new webpack.HotModuleReplacementPlugin())
+        plugins.push( new BundleAnalyzerPlugin({
+          openAnalyzer: false
+        }))
+      }
+      return plugins
+    }
+
+И снова все пушим
+
