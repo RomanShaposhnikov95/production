@@ -1,16 +1,16 @@
-import type {Meta, StoryObj} from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
-import {Sidebar} from './Sidebar';
-import {ThemeDecorator} from "shared/config/storybook/ThemeDecorator/ThemeDecorator";
-import {Theme} from "app/providers/ThemeProvider";
+import { Sidebar } from './Sidebar';
+import { ThemeDecorator } from 'shared/config/storybook/ThemeDecorator/ThemeDecorator';
+import { Theme } from 'app/providers/ThemeProvider';
 
 const meta = {
-    title: 'widget/Sidebar',
-    component: Sidebar,
-    parameters: {
-        layout: 'fullscreen',
-    },
-    argTypes: {},
+  title: 'widget/Sidebar',
+  component: Sidebar,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  argTypes: {},
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;
@@ -18,17 +18,17 @@ type Story = StoryObj<typeof meta>;
 
 
 export const Light: Story = {
-    args: {
+  args: {
 
-    },
+  },
 };
 
 
 export const Dark: Story = {
-    args: {
+  args: {
 
-    },
-    decorators: [ThemeDecorator(Theme.DARK)]
+  },
+  decorators: [ThemeDecorator(Theme.DARK)]
 };
 
 

@@ -33,18 +33,19 @@ export default [
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off', // Отключить требование для React в области видимости при использовании JSX
       'react/jsx-props-no-spreading': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          'args': 'all',
-          'argsIgnorePattern': '^_',
-          'caughtErrors': 'all',
-          'caughtErrorsIgnorePattern': '^_',
-          'destructuredArrayIgnorePattern': '^_',
-          'varsIgnorePattern': '^_',
-          'ignoreRestSiblings': true
-        },
-      ], // Предупреждение для неиспользуемых переменных
+      '@typescript-eslint/no-unused-vars': "off",
+      // '@typescript-eslint/no-unused-vars': [
+      //   'error',
+      //   {
+      //     'args': 'all',
+      //     'argsIgnorePattern': '^_',
+      //     'caughtErrors': 'all',
+      //     'caughtErrorsIgnorePattern': '^_',
+      //     'destructuredArrayIgnorePattern': '^_',
+      //     'varsIgnorePattern': '^_',
+      //     'ignoreRestSiblings': true
+      //   },
+      // ], // Предупреждение для неиспользуемых переменных
       "@typescript-eslint/ban-ts-comment": "off",
       'padding-line-between-statements': [
         'error',

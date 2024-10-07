@@ -1,16 +1,16 @@
-import type {Meta, StoryObj} from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
-import {ThemeSwitcher} from './ThemeSwitcher';
-import {ThemeDecorator} from "shared/config/storybook/ThemeDecorator/ThemeDecorator";
-import {Theme} from "app/providers/ThemeProvider";
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ThemeDecorator } from 'shared/config/storybook/ThemeDecorator/ThemeDecorator';
+import { Theme } from 'app/providers/ThemeProvider';
 
 const meta = {
-    title: 'ui/ThemeSwitcher',
-    component: ThemeSwitcher,
-    parameters: {
-        layout: 'fullscreen',
-    },
-    argTypes: {},
+  title: 'ui/ThemeSwitcher',
+  component: ThemeSwitcher,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  argTypes: {},
 } satisfies Meta<typeof ThemeSwitcher>;
 
 export default meta;
@@ -18,17 +18,17 @@ type Story = StoryObj<typeof meta>;
 
 
 export const Normal: Story = {
-    args: {
+  args: {
 
-    },
+  },
 };
 
 export const Dark: Story = {
-    args: {
+  args: {
 
-    },
+  },
 
-    decorators: [ThemeDecorator(Theme.DARK)]
+  decorators: [ThemeDecorator(Theme.DARK)]
 };
 
 
