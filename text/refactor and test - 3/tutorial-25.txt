@@ -1,0 +1,166 @@
+подключаем сторибук:
+
+    npx sb init --builder webpack5
+
+автоматически создается в корне папка .storybook
+переносим ее в папку config и переменовываем в storybook
+и в package.json
+        "storybook": "storybook dev -p 6006 -c ./config/storybook",
+        "build-storybook": "storybook build"
+
+в storybook > main.ts
+    const config: StorybookConfig = {
+      stories: [
+        "../../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+      ],
+      addons: [
+        "@storybook/addon-webpack5-compiler-swc",
+        "@storybook/addon-onboarding",
+        "@storybook/addon-links",
+        "@storybook/addon-essentials",
+        "@chromatic-com/storybook",
+        "@storybook/addon-interactions",
+      ],
+      framework: {
+        name: "@storybook/react-webpack5",
+        options: {},
+      },
+    };
+    export default config;
+
+В папке shared > ui > Button > создаем файл Button.storieas.tsx
+и переноси в этот файл все что было создано самим storybook примере
+
+    import type { Meta, StoryObj } from '@storybook/react';
+    import { fn } from '@storybook/test';
+
+    import { Button } from './Button';
+
+    const meta = {
+        title: 'ui/Button',
+        component: Button,
+        parameters: {
+            layout: 'centered',
+        },
+        tags: ['autodocs'],
+        argTypes: {
+            backgroundColor: { control: 'color' },
+        },
+        args: { onClick: fn() },
+    } satisfies Meta<typeof Button>;
+
+    export default meta;
+    type Story = StoryObj<typeof meta>;
+
+    export const Primary: Story = {
+        args: {
+            primary: true,
+            label: 'Button',
+        },
+    };
+
+    export const Secondary: Story = {
+        args: {
+            label: 'Button',
+        },
+    };
+
+    export const Large: Story = {
+        args: {
+            size: 'large',
+            label: 'Button',
+        },
+    };
+
+    export const Small: Story = {
+        args: {
+            size: 'small',
+            label: 'Button',
+        },
+    };
+
+
+В папке config > storybook > создаем файл webpack.config.ts
+
+   import webpack from "webpack";
+   import path from 'path';
+   import {BuildPaths} from "../build/types/config";
+   import {buildCssLoader} from "../build/loaders/buildCssLoader";
+
+   export default ({config}: {config: webpack.Configuration}) => {
+       const paths: BuildPaths = {
+           build: '',
+           html: '',
+           entry: '',
+           src: path.resolve(__dirname, '..', '..', 'src')
+       }
+       config.resolve.modules.push(paths.src);
+       config.resolve.extensions.push('.ts', '.tsx');
+
+       config.module.rules.push(buildCssLoader(true)) // смотреть ниже
+
+       return config
+   };
+
+В папке config > build > создаем папку loaders > а в ней buildCssLoader.ts
+
+    export function buildCssLoader(isDev: boolean) {
+        return {
+            test: /\.s[ac]ss$/i,
+            use: [
+                isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader',
+                    options: {
+                        modules: {
+                            auto: (resPath: string) => Boolean(resPath.includes('.module.')),
+                            localIdentName: isDev ? '[path][name]__[local]' : '[hash:base64:8]',
+                            namedExport: false,
+                        },
+                    }
+                },
+                'sass-loader',
+            ],
+        }
+    }
+
+сюда мы переносим все с buildLoaders.ts css loader! Это для того чтобы мы могли несколько раз переиспользовать этот loader
+в нашем случае это сама сборка webpack а во второ случае для storybook
+
+Но запустив сторибук падает ошибка и погуглив нужно в storybook > main.ts
+    import type { StorybookConfig } from "@storybook/react-webpack5";
+
+    const config: StorybookConfig = {
+      stories: [
+        "../../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+      ],
+      addons: [
+        "@storybook/addon-webpack5-compiler-swc",
+        "@storybook/addon-onboarding",
+        "@storybook/addon-links",
+        "@storybook/addon-essentials",
+        "@chromatic-com/storybook",
+        "@storybook/addon-interactions",
+      ],
+      framework: {
+        name: "@storybook/react-webpack5",
+        options: {},
+      },
+      swc: () => ({
+        jsc: {
+          transform: {
+            react: {
+              runtime: 'automatic'
+            }
+          }
+        }
+      }), // добавить это!
+    };
+    export default config;
+
+
+Что бы запустить storybook в терминале запускаем npm run storybook
+
+
+
+

@@ -1,0 +1,50 @@
+здесь будем проходить скриншот тесты
+    устанавливаем npm i -D loki
+    затем npx loki init
+И у нас падает такая ошибка Storybook config path not found at ".storybook", try passing a --config argument
+Она из за того что мы переместиди конфигурацию storybook
+Чтоб исправить ее это мы задаем путь npx loki init --config ./config/storybook
+Теперб в файл package.json автоматически создасться
+     "loki": {
+        "configurations": {
+          "chrome.laptop": {
+            "target": "chrome.app",
+            "width": 1366,
+            "height": 768,
+            "deviceScaleFactor": 1,
+            "mobile": false
+          },
+          "chrome.iphone7": {
+            "target": "chrome.app",
+            "preset": "iPhone 7"
+          }
+        }
+      }
+
+
+Лучше заменить "target": "chrome.docker", так как в "target": "chrome.app" не работает коректно
+
+    "loki": {
+            "configurations": {
+              "chrome.laptop": {
+                "target": "chrome.docker",
+                "width": 1366,
+                "height": 768,
+                "deviceScaleFactor": 1,
+                "mobile": false
+              },
+              "chrome.iphone7": {
+                "target": "chrome.docker",
+                "preset": "iPhone 7"
+              }
+            }
+          }
+
+
+И запускаем npx loki test
+
+Теперь он делает скриншоты. И теперь изменив какойто css параметр то он будет сравнивать со старыми скринами и ьесь не пройдет если
+стили изменились.
+Так же для удоюства доюавим команды в packages.json
+    "test:ui": "npx loki test", - запустить тест
+    "test:ui:ok": "npx loki approve" - подвердмить изменения

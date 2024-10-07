@@ -32,8 +32,10 @@
         }
       },
       "include": [
-        "./config/jest/setupTests.ts" // - эту строку
-      ]
+        "./config/jest/setupTests.ts"
+        "./src/**/*.ts",
+      "./src/**/*.tsx"
+      ] // - эту строку
     }
 
 
