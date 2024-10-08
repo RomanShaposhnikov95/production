@@ -1,5 +1,5 @@
 import { StoryFn } from '@storybook/react';
-import { Theme } from 'app/providers/ThemeProvider';
+import { Theme, ThemeProvider } from 'app/providers/ThemeProvider';
 
 // export const ThemeDecorator = (theme: Theme) => (StoryComponent: StoryFn) => (
 //   <div className={`app ${theme}`}>
@@ -10,9 +10,11 @@ import { Theme } from 'app/providers/ThemeProvider';
 
 export const ThemeDecorator = (theme: Theme) => {
   const DecoratedComponent = (StoryComponent: StoryFn) => (
-    <div className={`app ${theme}`}>
-      <StoryComponent />
-    </div>
+    <ThemeProvider initialTheme={theme}>
+      <div className={`app ${theme}`}>
+        <StoryComponent/>
+      </div>
+    </ThemeProvider>
   );
 
   DecoratedComponent.displayName = `ThemeDecorator(${theme})`; // Устанавливаем имя для декорированного компонента

@@ -1,0 +1,9 @@
+Будем править стили модалки!
+
+И установим json сервер npm i -g json-server ( туториал - https://github.com/typicode/json-server/tree/v0)
+Затем создаем папку в корне проекта json-server внутри db.json
+Чтоб запустить выполняем команду json-server --watch ./json-server/db.json --port 3001
+И создаем в этой папаке второй файл index.js и в него я просто скопировал код с видео урока.
+Так же в package.json добовляем скрипт "start:dev:server": "node ./json-server/index.js"
+Нужно плюсом утсановить как dev зависимост для этого npm i -D json-server@0.17.4 так как в новой версии конфликты!
+И теперб по адресу http://localhost:8000/posts есть данные

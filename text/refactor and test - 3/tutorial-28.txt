@@ -1,0 +1,87 @@
+В жтом уроке просто стилизуем sidebar
+
+Еще перделываем router-dom тестирование! Для этого создаем папку
+    componentsRender
+        componentsRender.tsx
+            import { ReactNode } from 'react';
+            import { render } from '@testing-library/react';
+            import { I18nextProvider } from 'react-i18next';
+            import i18nForTests from 'shared/config/i18n/i18nForTests';
+            import { MemoryRouter } from 'react-router-dom';
+
+            export interface componentRenderOptions {
+                route?: string;
+            }
+
+            export function componentRender (component: ReactNode, options: componentRenderOptions = {}) {
+              const {
+                route = '/',
+              } = options;
+
+              return render(
+                <MemoryRouter initialEntries={[route]}>
+                  <I18nextProvider i18n={i18nForTests}>
+                    {component}
+                  </I18nextProvider>
+                        ,
+                </MemoryRouter>,
+              );
+            }
+
+
+
+И теперь в ui > Sidebar > Sidebar.test.tsx
+    describe('Sidebar', () => {
+      test('with only first param', () => {
+        componentRender(<Sidebar/>) // меняем эту часть
+        expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+      });
+
+      test('test toggle', () => {
+        componentRender(<Sidebar/>) // меняем эту часть
+        const toggleBtn = screen.getByTestId('sidebar-toggle');
+        expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+        fireEvent.click(toggleBtn);
+        expect(screen.getByTestId('sidebar')).toHaveClass('collapsed');
+      });
+    });
+
+
+Так же используя скриншотные тесты loki невозможно сравнивать со старыми скринами
+так как много элементов и для этого устанавливаем npm i -D reg-cli
+В корне создаем папку scripts
+    в ней generate-visual-json-report.js
+
+        const { promisify } = require('util');
+        const { readdir, writeFile } = require('fs');
+        const { join: joinPath, relative } = require('path');
+
+        const asyncReaddir = promisify(readdir);
+        const writeFileAsync = promisify(writeFile);
+
+        const lokiDir = joinPath(__dirname, '..', '.loki');
+        const actualDir = joinPath(lokiDir, 'current');
+        const expectedDir = joinPath(lokiDir, 'reference');
+        const diffDir = joinPath(lokiDir, 'difference');
+
+        (async function main () {
+          const diffs = await asyncReaddir(diffDir);
+
+          await writeFileAsync(joinPath(lokiDir, 'report.json'), JSON.stringify({
+            newItems: [],
+            deletedItems: [],
+            passedItems: [],
+            failedItems: diffs,
+            expectedItems: diffs,
+            actualItems: diffs,
+            diffItems: diffs,
+            actualDir: relative(lokiDir, actualDir),
+            expectedDir: relative(lokiDir, expectedDir),
+            diffDir: relative(lokiDir, diffDir),
+          }));
+        }());
+
+И в package.json добавляем скрипты запуска
+    "test:ui:report": "npm run test:ui:json && npm run test:ui:html",
+    "test:ui:json": "node scripts/generate-visual-json-report.json",
+    "test:ui:html": "reg-cli --from .loki/report.json --report .loki/report.html"

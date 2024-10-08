@@ -1,0 +1,8 @@
+устанаваливаем redux toolkit npm install @reduxjs/toolkit react-redux
+
+Создаем папку в src > providers >
+                    StoreProvider
+И в папке entities создаем Папку Counter
+
+Дальше смотреть в проекте!
+
