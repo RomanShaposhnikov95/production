@@ -34,6 +34,7 @@ export default [
       'react/react-in-jsx-scope': 'off', // Отключить требование для React в области видимости при использовании JSX
       'react/jsx-props-no-spreading': 'warn',
       '@typescript-eslint/no-unused-vars': "off",
+      '@typescript-eslint/no-explicit-any': "off",
       // '@typescript-eslint/no-unused-vars': [
       //   'error',
       //   {
