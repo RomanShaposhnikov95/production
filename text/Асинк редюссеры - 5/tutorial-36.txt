@@ -1,0 +1,2 @@
+мы пишем тесты на features > AuthByUserName > model > services > loginByUserName > loginByUserName.test.ts
+Так же на features > AuthByUserName > model > slice > loginSlice.test.ts
