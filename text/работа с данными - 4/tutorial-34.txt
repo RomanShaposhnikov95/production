@@ -1,0 +1,50 @@
+Здесь мы подключимRedux toolkit к модальному окну форма авторизации и сделаем возможность логина и так же сохранять пользователя в localstorage
+Чтоб у нас форма работала в storybook нужно создать декоратор
+
+    import { StoryFn } from '@storybook/react';
+    import { StateSchema, StoreProvider } from 'app/providers/StoreProvider';
+
+    export const StoreDecorator = (state: Partial<StateSchema>) => {
+      const DecoratedStory = (Story: StoryFn) => (
+        <StoreProvider initialState={state}>
+          <Story />
+        </StoreProvider>
+      );
+
+      DecoratedStory.displayName = 'StoreDecorator'; // Установите displayName
+
+      return DecoratedStory;
+    };
+
+И в папке config > storybook > webpack.config.ts
+    export default ({ config }: {config: webpack.Configuration}) => {
+      const paths: BuildPaths = {
+        build: '',
+        html: '',
+        entry: '',
+        src: path.resolve(__dirname, '..', '..', 'src')
+      }
+      config.resolve.modules.push(paths.src);
+      config.resolve.extensions.push('.ts', '.tsx');
+
+      config.module.rules = config.module.rules.map((rule: RuleSetRule) => {
+        if (/svg/.test(rule.test as string)) {
+          return { ...rule, exclude: /\.svg$/i };
+        }
+
+        return rule;
+      });
+
+
+      config.module.rules.push({
+        test: /\.svg$/,
+        use: ['@svgr/webpack']
+      });
+      config.module.rules.push(buildCssLoader(true));
+
+      config.plugins.push(new DefinePlugin({
+        __IS_DEV__: true,
+      }));                                          // ----Тут мы добавили DefinePlugin плагин
+
+      return config
+    };

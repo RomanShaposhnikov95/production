@@ -1,0 +1,179 @@
+В этом видео мы будем оптимизировать redux toolkit для начал мы создадим  компонент LoginFormAsync
+И вынесем в него LoginForm.tsx --- смотреть код чтоб он подгружался когда мы откроем форму
+
+Следущее мы будем оптимизировать slice так как у нас может быть много action и это скажется на размере bundle
+Для этого в папке app > providers > StoreProviders мы создаем файл reducerManager.ts
+    import {
+      UnknownAction, combineReducers, Reducer, ReducersMapObject,
+    } from '@reduxjs/toolkit';
+    import { ReducerManager, StateSchema, StateSchemaKey } from './StateSchema';
+
+    export function createReducerManager (initialReducers: ReducersMapObject<StateSchema>): ReducerManager {
+      const reducers = { ...initialReducers };
+
+      let combinedReducer = combineReducers(reducers);
+
+      let keysToRemove: Array<StateSchemaKey> = [];
+
+      return {
+        getReducerMap: () => reducers,
+        reduce: (state: StateSchema, action: UnknownAction) => {
+          if (keysToRemove.length > 0) {
+            state = { ...state };
+            keysToRemove.forEach((key) => {
+              delete state[key];
+            });
+            keysToRemove = [];
+          }
+          return combinedReducer(state, action);
+        },
+        add: (key: StateSchemaKey, reducer: Reducer) => {
+          if (!key || reducers[key]) {
+            return;
+          }
+          reducers[key] = reducer;
+
+          combinedReducer = combineReducers(reducers);
+        },
+        remove: (key: StateSchemaKey) => {
+          if (!key || !reducers[key]) {
+            return;
+          }
+          delete reducers[key];
+          keysToRemove.push(key);
+          combinedReducer = combineReducers(reducers);
+        },
+      };
+    }
+
+Это файл из туториала redux toolkit загуглив redux code spliting
+
+Следущее в файле store.ts мы можем удалить из rootReducers loginForm: loginReducer
+
+      const rootReducers: ReducersMapObject<StateSchema> = {
+        counter: counterReducer,
+        user: userReducer,
+        // loginForm: loginReducer <----- удалить!
+      };
+
+
+в целом файл теперь выгляжет так:
+    export function createReduxStore (initialState?: StateSchema) {
+      const rootReducers: ReducersMapObject<StateSchema> = {
+        counter: counterReducer,
+        user: userReducer,
+        // loginForm: loginReducer - удалить
+      };
+
+      const reducerManager = createReducerManager(rootReducers) // -добвили это!
+
+      const store = configureStore<StateSchema>({
+        reducer: reducerManager.reduce, // <--- заменили эту часть было rootReducers
+        devTools: __IS_DEV__,
+        preloadedState: initialState,
+      });
+
+      // @ts-ignore
+      store.reducerManager = reducerManager // -добвили это! И // @ts-ignore так как у store нет такого ключа reducerManager и сы это позже исправим!
+
+      return store
+    }
+
+    const store = createReduxStore();
+
+    // Infer the `RootState` and `AppDispatch` types from the store itself
+    export type RootState = ReturnType<typeof store.getState>
+    // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+    export type AppDispatch = typeof store.dispatch
+
+
+Теперь в компаненте LoginForm.tsx мы делаем так что при монтирование компоненты в store создается action loginForm
+
+     useEffect(() => {
+        store.reducerManager.add('loginForm', loginReducer)
+        dispatch({type: '@INIT loginForm reducer'}) / <-- это можно добавить по желанию что в панеле network/redux видеть изменения
+
+        return () => {
+          store.reducerManager.remove('loginForm')
+          dispatch({type: '@DESTROY loginForm reducer'}) / <-- это можно добавить по желанию что в панеле network/redux видеть изменения
+        }
+      }, []);
+
+Но теперь падает ошибка так как useSelector еще не создан будто бы поэтому переносим его вверх useEffect а лучше
+в папке ../model/selectors/  мы просто создадим для каждого роля свой state
+      const store = useStore() as ReduxStoreWithManager;
+      const username = useSelector(getLoginUsername);
+      const password = useSelector(getLoginPassword);
+      const isLoading = useSelector(getLoginIsLoading);
+      const error = useSelector(getLoginError);
+
+Для более понимания смотри код этого урока
+Теперь когда я открываю форму мне нужно ввести что то в инпут чтоб в redux создался action
+
+Есть одно но!
+Каждый раз использовать эту конструкцию избыточно
+     useEffect(() => {
+        store.reducerManager.add('loginForm', loginReducer)
+        dispatch({type: '@INIT loginForm reducer'}) / <-- это можно добавить по желанию что в панеле network/redux видеть изменения
+
+        return () => {
+          store.reducerManager.remove('loginForm')
+          dispatch({type: '@DESTROY loginForm reducer'}) / <-- это можно добавить по желанию что в панеле network/redux видеть изменения
+        }
+      }, []);
+
+
+В папке shared > lib > создадим папку components > DynamicModuleLoader > DynamicModuleLoader.tsx
+    import { FC, ReactNode, useEffect } from 'react';
+    import { useDispatch, useStore } from 'react-redux';
+    import { ReduxStoreWithManager, StateSchemaKey } from 'app/providers/StoreProvider/config/StateSchema';
+    import { Reducer } from '@reduxjs/toolkit';
+
+    export type ReducersList = {
+        [name in StateSchemaKey]?: Reducer;
+    }
+
+    type ReducersListEntry = [StateSchemaKey, Reducer]
+
+    interface DynamicModuleLoaderProps {
+        children: ReactNode,
+        reducers: ReducersList;
+        removeAfterUnmount?: boolean;
+    }
+
+    export const DynamicModuleLoader: FC<DynamicModuleLoaderProps> = (props) => {
+      const {
+        children,
+        reducers,
+        removeAfterUnmount,
+      } = props;
+
+      const store = useStore() as ReduxStoreWithManager;
+      const dispatch = useDispatch();
+
+      useEffect(() => {
+        Object.entries(reducers).forEach(([name, reducer]: ReducersListEntry) => {
+          store.reducerManager.add(name, reducer);
+          dispatch({ type: `@INIT ${name} reducer` });
+        });
+
+        return () => {
+          if (removeAfterUnmount) {
+            Object.entries(reducers).forEach(([name, reducer]: ReducersListEntry) => {
+              store.reducerManager.remove(name);
+              dispatch({ type: `@DESTROY ${name} reducer` });
+            });
+          }
+        };
+        // eslint-disable-next-line
+        }, []);
+
+      return (
+        <>
+          {children}
+        </>
+      );
+    };
+
+
+И теперь оборачиваем компоненту loginForm в DynamicModuleLoader

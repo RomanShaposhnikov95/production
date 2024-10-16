@@ -5,7 +5,7 @@ import { ThemeDecorator } from 'shared/config/storybook/ThemeDecorator/ThemeDeco
 import { Theme } from 'app/providers/ThemeProvider';
 
 const meta = {
-  title: 'ui/Modal',
+  title: 'ui/Input',
   component: Input,
   parameters: {
     layout: 'fullscreen',
