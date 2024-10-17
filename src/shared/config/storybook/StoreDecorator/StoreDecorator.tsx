@@ -2,6 +2,7 @@ import { StoryFn } from '@storybook/react';
 import { StateSchema, StoreProvider } from 'app/providers/StoreProvider';
 import { ReducersMapObject } from '@reduxjs/toolkit';
 import { loginReducer } from 'features/AuthByUsername/model/slice/loginSlice';
+import { profileReducer } from 'entities/Profile';
 
 
 // export const StoreDecorator = (state: Partial<StateSchema>) => (Story: StoryFn) => (
@@ -11,7 +12,8 @@ import { loginReducer } from 'features/AuthByUsername/model/slice/loginSlice';
 // );
 
 const defaultAsyncReducers: Partial<ReducersMapObject<StateSchema>> = {
-  loginForm: loginReducer
+  loginForm: loginReducer,
+  profile: profileReducer
 }
 
 

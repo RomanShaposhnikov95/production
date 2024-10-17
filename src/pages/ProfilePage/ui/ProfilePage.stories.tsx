@@ -1,29 +1,39 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import LoginForm from './LoginForm';
+import ProfilePage from './ProfilePage';
 import { ThemeDecorator } from 'shared/config/storybook/ThemeDecorator/ThemeDecorator';
 import { Theme } from 'app/providers/ThemeProvider';
 import { StoreDecorator } from 'shared/config/storybook/StoreDecorator/StoreDecorator';
 
 const meta = {
-  title: 'widget/LoginForm',
-  component: LoginForm,
+  title: 'pages/ProfilePage',
+  component: ProfilePage,
   parameters: {
     layout: 'fullscreen',
   },
-  argTypes: {},
-} satisfies Meta<typeof LoginForm>;
+  argTypes: {
+
+  },
+} satisfies Meta<typeof ProfilePage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 
-export const Primary: Story = {
+export const Normal: Story = {
   args: {
-    onSuccess: () => {}
+
   },
-  decorators: [StoreDecorator({
-    loginForm: { username: 'admin', password: '123', isLoading: false }
-  })]
+
+  decorators: [StoreDecorator({})]
 };
+
+export const Dark: Story = {
+  args: {
+
+  },
+
+  decorators: [ThemeDecorator(Theme.DARK), StoreDecorator({})]
+};
+
 
