@@ -8,18 +8,18 @@ import './shared/config/i18n/i18n';
 import { ErrorBoundary } from 'app/providers/ErrorBoundary';
 import { StoreProvider } from 'app/providers/StoreProvider';
 
-const container = document.getElementById('root');
+const container = document.getElementById('root') as HTMLElement;
 const root = ReactDOM.createRoot(container);
 root.render(
   <React.StrictMode>
-    <StoreProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <StoreProvider>
         <ErrorBoundary>
           <ThemeProvider>
             <App/>
           </ThemeProvider>
         </ErrorBoundary>
-      </BrowserRouter>
-    </StoreProvider>
+      </StoreProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

@@ -12,7 +12,8 @@ export function createReducerManager (initialReducers: ReducersMapObject<StateSc
 
   return {
     getReducerMap: () => reducers,
-    reduce: (state: StateSchema, action: UnknownAction) => {
+    // reduce: (state: StateSchema, action: UnknownAction) => {
+    reduce: (state: any, action: UnknownAction) => {
       if (keysToRemove.length > 0) {
         state = { ...state };
         keysToRemove.forEach((key) => {

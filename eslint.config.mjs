@@ -13,7 +13,9 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.es2021
+        ...globals.es2021,
+        __IS_DEV__: true,
+        __API__: true
       }
     }
   },

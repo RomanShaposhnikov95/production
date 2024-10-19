@@ -1,0 +1,254 @@
+Здесь мы будем делать instance чтою всегда не писать api
+Изначально мы в папке src > shared создаем папаку api > api.ts
+
+    import axios from 'axios';
+    import { USER_LOCALSTORAGE_KEY } from 'shared/const/localstorage';
+
+    export const $api = axios.create({
+      baseURL: __API__,
+      headers: {
+        authorization: localStorage.getItem(USER_LOCALSTORAGE_KEY) || '',
+      },
+    });
+
+но чтобы получить здесь  __API__ нужно сперва его добавить файл который находится в корне проекта webpack.config.ts
+
+    export default (env: BuildEnv) => {
+
+      const paths: BuildPaths = {
+        entry: path.resolve(__dirname, 'src', 'index.tsx'),
+        build: path.resolve(__dirname, 'build'),
+        html: path.resolve(__dirname, 'public', 'index.html'),
+        src: path.resolve(__dirname, 'src')
+      }
+
+      const mode = env.mode || 'development'
+      const PORT = env.port || 3000;
+      const isDev = mode === 'development';
+      const apiUrl = env.apiUrl || 'http://localhost:8000'; // <----- дабавили это
+
+      const config: webpack.Configuration = buildWebpackConfig({
+        mode,
+        paths,
+        isDev,
+        port: PORT,
+        apiUrl // <----- дабавили это
+      });
+
+      return config;
+    }
+
+Дальше прокидываем переменную в config > build > buildPlugins.ts
+    export function buildPlugins ({ paths, isDev, apiUrl }:BuildOptions): webpack.WebpackPluginInstance[] { // <----- дабавили это "apiUrl"
+      const plugins = [
+        new webpack.ProgressPlugin(),
+        new HtmlWebpackPlugin({
+          template: paths.html
+        }),
+        new MiniCssExtractPlugin({
+          filename: 'css/[name].[contenthash:8].css',
+          chunkFilename: 'css/[name].[contenthash:8].css'
+        }),
+        new webpack.DefinePlugin({
+          __IS_DEV__: JSON.stringify(isDev),
+          __API__: JSON.stringify(apiUrl), // <----- дабавили это
+        }),
+      ]
+
+      if (isDev) {
+        plugins.push(new webpack.HotModuleReplacementPlugin())
+        plugins.push(new BundleAnalyzerPlugin({
+          openAnalyzer: false
+        }))
+      }
+      return plugins
+    }
+
+так же в папке config > build > types > config.ts
+    export type BuildMode = 'production' | 'development';
+
+    export interface BuildPaths {
+        entry: string;
+        build: string;
+        html: string;
+        src: string;
+    }
+
+    export interface BuildEnv {
+        mode: BuildMode;
+        port: number;
+        apiUrl: string // <----- дабавили это
+    }
+
+    export interface BuildOptions {
+        mode: BuildMode;
+        paths: BuildPaths;
+        isDev: boolean;
+        port: number;
+        apiUrl: string // <----- дабавили это
+    }
+
+паралельно прокидываем переменную в config > jest > jest.config.ts
+
+    const config: Config = {
+      // All imported modules in your tests should be mocked automatically
+      // automock: false,
+
+      // Stop running tests after `n` failures
+      // bail: 0,
+
+      // The directory where Jest should store its cached dependency information
+      // cacheDirectory: "/private/var/folders/j6/1hd_p7q928dbnkvkpsy43sx00000gn/T/jest_dx",
+
+      // Automatically clear mock calls, instances, contexts and results before every test
+      globals: {
+        __IS_DEV__: true,
+        __API__: '',
+      },   // <----- дабавили это
+
+
+паралельно прокидываем переменную в config > storybook > webpack.config.ts
+
+    export default ({ config }: {config: webpack.Configuration}) => {
+      const paths: BuildPaths = {
+        build: '',
+        html: '',
+        entry: '',
+        src: path.resolve(__dirname, '..', '..', 'src')
+      }
+      config.resolve.modules.push(paths.src);
+      config.resolve.extensions.push('.ts', '.tsx');
+
+      config.module.rules = config.module.rules.map((rule: RuleSetRule) => {
+        if (/svg/.test(rule.test as string)) {
+          return { ...rule, exclude: /\.svg$/i };
+        }
+
+        return rule;
+      });
+
+
+      config.module.rules.push({
+        test: /\.svg$/,
+        use: ['@svgr/webpack']
+      });
+      config.module.rules.push(buildCssLoader(true));
+
+      config.plugins.push(new DefinePlugin({
+        __IS_DEV__: JSON.stringify(true),
+        __API__: JSON.stringify(''),           // <----- дабавили это
+      }));
+
+      return config
+    };
+
+так же в корне проекта в eslint.config.mjs добавили
+    {
+        globals: {
+          __IS_DEV__: true,
+          __API__: true
+        },
+      },
+
+Далее в папке src > app > types > global.d.ts добавляем
+
+    declare const __IS_DEV__: boolean;
+    declare const __API__: string;
+
+Далее в папке src > app > providers > StoreProvider > config > store.ts
+    export function createReduxStore (
+      initialState?: StateSchema,
+      asyncReducers?: ReducersMapObject<StateSchema>,
+      navigate?: (to: To, options?: NavigateOptions) => void // <----- дабавили это
+
+    ) {
+      const rootReducers: ReducersMapObject<StateSchema> = {
+        ...asyncReducers,
+        counter: counterReducer,
+        user: userReducer,
+      };
+
+      const reducerManager = createReducerManager(rootReducers)
+
+      const store = configureStore<StateSchema>({
+        reducer: reducerManager.reduce,
+        devTools: __IS_DEV__,
+        preloadedState: initialState,
+        middleware: getDefaultMiddleware => getDefaultMiddleware({
+          thunk: {
+            extraArgument: {
+              api: $api,
+              navigate
+            }
+          }
+        }) // <----- дабавили это
+      });
+
+      // @ts-ignore
+      store.reducerManager = reducerManager
+
+      return store
+    }
+
+Далее в папке src > app > providers > StoreProvider > config > StateSchema.ts добавляем это
+
+    export interface ThunkExtraArg {
+        api: AxiosInstance;
+        navigate?: (to: To, options?: NavigateOptions) => void,
+    }
+
+    export interface ThunkConfig<T> {
+        rejectValue: T;
+        extra: ThunkExtraArg;
+    }
+
+
+Так же в src > app > providers > StoreProvider > ui > StoreProvider.tsx добавляем это
+    export const StoreProvider = (props: StoreProviderProps) => {
+      const {
+        children,
+        initialState,
+        asyncReducers
+      } = props;
+
+      const navigate = useNavigate()   // добавили это чтоб потом получать далее в асинхпрнных запросах
+
+      const store = createReduxStore(
+          initialState as StateSchema,
+          asyncReducers as ReducersMapObject<StateSchema>,
+          navigate // - прокидываем
+      );
+
+      return (
+        <Provider store={store}>
+          {children}
+        </Provider>
+      );
+    };
+
+Далее в папке src > features > AuthByUsername > model > services > loginByUsername > loginByUsername.ts
+
+    export const loginByUsername = createAsyncThunk<User, LoginByUsernameProps, ThunkConfig<string>>(
+      'login/loginByUsername',
+      async (authData, { extra, dispatch , rejectWithValue }) => {    //  { extra, dispatch , rejectWithValue } - эти параметры в библиотеке поумолчани
+        try {
+          const response = await extra.api.post<User>('/login', authData); // получаем extra.api.po
+
+          if (!response.data) {
+            throw new Error();
+          }
+
+          localStorage.setItem(USER_LOCALSTORAGE_KEY, JSON.stringify(response.data));
+          dispatch(userActions.setAuthData(response.data));
+          extra.navigate('/about');         // <---- а здесь можем получить navigate!
+
+          return response.data;
+        } catch (e) {
+          console.log(e);
+          return rejectWithValue('error');
+        }
+      },
+    );
+
+
+

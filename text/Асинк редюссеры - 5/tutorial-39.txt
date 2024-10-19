@@ -1,0 +1,2 @@
+Подключаем компоненту Profile к redux toolkit
+И в файле tsconfig.json добавляем  "strict": true, это строгий режим

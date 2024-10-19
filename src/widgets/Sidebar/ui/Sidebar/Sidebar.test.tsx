@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { Sidebar } from './Sidebar';
 import { componentRender } from 'shared/lib/tests/componentRender/componentRender';
+import { BrowserRouter } from 'react-router-dom';
 
 describe('Sidebar', () => {
   test('with only first param', () => {

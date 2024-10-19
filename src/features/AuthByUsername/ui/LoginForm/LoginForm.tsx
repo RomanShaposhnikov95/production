@@ -22,7 +22,6 @@ export interface LoginFormProps {
     onSuccess: () => void
 }
 
-
 const initialReducers: ReducersList = {
   loginForm: loginReducer,
 };
@@ -31,19 +30,11 @@ const initialReducers: ReducersList = {
 const LoginForm = memo(({ className, onSuccess }: LoginFormProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const store = useStore() as ReduxStoreWithManager;
   const username = useSelector(getLoginUsername);
   const password = useSelector(getLoginPassword);
   const isLoading = useSelector(getLoginIsLoading);
   const error = useSelector(getLoginError);
 
-  useEffect(() => {
-    store.reducerManager.add('loginForm', loginReducer)
-
-    return () => {
-      store.reducerManager.remove('loginForm')
-    }
-  }, []);
 
   const onChangeUsername = useCallback((value: string) => {
     dispatch(loginActions.setUsername(value));
@@ -58,7 +49,6 @@ const LoginForm = memo(({ className, onSuccess }: LoginFormProps) => {
     if (result.meta.requestStatus === 'fulfilled') {
       onSuccess()
     }
-
   }, [onSuccess, dispatch, password, username]);
 
   return (
