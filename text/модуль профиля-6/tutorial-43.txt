@@ -1,0 +1,114 @@
+в этом уроке мы будем писать тесты и сторибук на все что связнанно с profile
+
+Но в profilePage.stories.ts у нас будут падать ошибка так как мы делаем на странице profilePage запрос на сервер чтоб ролучить данные
+профайла через useEffect.
+
+Чтоб это решить нужно разделалить процессы.
+В папке config > build > types > config.ts
+    export interface BuildOptions {
+        mode: BuildMode;
+        paths: BuildPaths;
+        isDev: boolean;
+        port: number;
+        apiUrl: string;
+        project: 'storybook' | 'frontend' | 'jest' // <----- добавили это!
+    }
+
+Далее в файле корне проекта webpack.config.ts
+
+    export default (env: BuildEnv) => {
+
+      const paths: BuildPaths = {
+        entry: path.resolve(__dirname, 'src', 'index.tsx'),
+        build: path.resolve(__dirname, 'build'),
+        html: path.resolve(__dirname, 'public', 'index.html'),
+        src: path.resolve(__dirname, 'src')
+      }
+
+      const mode = env.mode || 'development'
+      const PORT = env.port || 3000;
+      const isDev = mode === 'development';
+      const apiUrl = env.apiUrl || 'http://localhost:8000';
+
+      const config: webpack.Configuration = buildWebpackConfig({
+        mode,
+        paths,
+        isDev,
+        port: PORT,
+        apiUrl,
+        project: 'frontend' // <----- добавили это!
+      });
+
+      return config;
+    }
+
+Далее В папке config > build > buildPlugins.ts
+
+    export function buildPlugins ({ paths, isDev, apiUrl, project }:BuildOptions): webpack.WebpackPluginInstance[] { // <----- добавили project в импорт!
+      const plugins = [
+        new webpack.ProgressPlugin(),
+        new HtmlWebpackPlugin({
+          template: paths.html
+        }),
+        new MiniCssExtractPlugin({
+          filename: 'css/[name].[contenthash:8].css',
+          chunkFilename: 'css/[name].[contenthash:8].css'
+        }),
+        new webpack.DefinePlugin({
+          __IS_DEV__: JSON.stringify(isDev),
+          __API__: JSON.stringify(apiUrl),
+          __PROJECT__: JSON.stringify(project) // <----- добавили это!
+        }),
+      ]
+
+      if (isDev) {
+        plugins.push(new webpack.HotModuleReplacementPlugin())
+        plugins.push(new BundleAnalyzerPlugin({
+          openAnalyzer: false
+        }))
+      }
+      return plugins
+    }
+
+
+Теперь тоде самое в папке config > jest > jest.config.ts
+      globals: {
+        __IS_DEV__: true,
+        __API__: '',
+        __PROJECT__: 'jest' // <----- добавили это!
+      },
+
+Теперь тоде самое в папке config > storybook > webpack.config.ts
+
+      config!.plugins!.push(new DefinePlugin({
+        __IS_DEV__: JSON.stringify(true),
+        __API__: JSON.stringify(''),
+        __PROJECT__: JSON.stringify('storybook'), // <----- добавили это!
+      }));
+
+
+Так же чтоб линтер не ругался в файлк .eslint.config.mjs
+      {
+        languageOptions: {
+          globals: {
+            ...globals.browser,
+            ...globals.es2021,
+            __IS_DEV__: true,
+            __API__: true,
+            __PROJECT__: true, // <----- добавили это!
+          }
+        }
+      },
+
+
+и так же чтоб typescript все подхватывал в src > app > types > global.d.ts
+
+    declare const __PROJECT__: 'storybook' | 'frontend' | 'jest'; // <----- добавили это! ('storybook' | 'frontend' | 'jest'; ) это чтоб был автокомплит
+
+
+Теперь компоненте profilePage.ts
+      useEffect(() => {
+        if (__PROJECT__ !== 'storybook') { // <----- добавили это!
+          dispatch(fetchProfileData());
+        }
+      }, [dispatch]);
