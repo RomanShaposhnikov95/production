@@ -1,0 +1,50 @@
+Как оказалось у нас не работает refreshPlugin для этого мы устанавливаем react-refresh-webpack-plugin
+ npm install -D @pmmmwh/react-refresh-webpack-plugin react-refresh
+ Далее в папке config > build > buildLoaders.ts
+По туториалу мы добовляем
+      const babelLoader = {
+        test: /\.(js|jsx|tsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: [
+              isDev && require.resolve('react-refresh/babel')
+            ] // <------ Добавили эту часть
+          }
+        }
+      }
+
+Далее в папке config > build > buildPlugins.ts по туториалу мы ипортируем:
+    import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+
+и
+      if (isDev) {
+        plugins.push(new ReactRefreshWebpackPlugin()) // <------ Добавили эту часть
+        plugins.push(new webpack.HotModuleReplacementPlugin())
+        plugins.push(new BundleAnalyzerPlugin({
+          openAnalyzer: false
+        }))
+      }
+
+так как loader разрастаются мы вынесем отдельно и создадим в папке config > build > loaders > buildBabelLoader.ts
+    import { BuildOptions } from '../types/config';
+
+    export function buildBabelLoader ({ isDev }: BuildOptions) {
+      return {
+        test: /\.(js|jsx|tsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: [
+              isDev && require.resolve('react-refresh/babel')
+            ].filter(Boolean)
+          }
+        }
+      }
+    }
+
+теперь перезапускаем npm run start:dev и все работает

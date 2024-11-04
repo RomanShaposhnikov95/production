@@ -1,0 +1,16 @@
+Мы постоянно чтобы запустить beckend и frontend вводи две команды такие как
+     "start": "webpack serve --env port=3000",
+      "start:dev:server": "node ./json-server/index.js",
+Но чтобы не запускать из отдельно есть такая вещь как npm i concurrently --save
+И по туториалу в package.json добавляем  "start:dev": "concurrently \"npm start\" \"npm run start:dev:server\"",
+И теперь все запускается на npm run start:dev
+
+
+Так же мы постоянно руками создаем каждый файл отдельно такие как
+    Button.tsx
+    Button.test.ts
+    Button.stories.ts
+А можно просто сделать template
+    открываем webstorm settings > editors > File and Code Templates
+
+Лучше смотреть в видео там все понятно!
