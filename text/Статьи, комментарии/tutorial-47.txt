@@ -1,0 +1,47 @@
+В этом уроке мы будем исправлять зашищенные маршруты.
+По туториалу react-router-6
+В папке src > app > providers > router > ui > создаем RequireAuth.tsx
+
+    import { useSelector } from 'react-redux';
+    import { getUserAuthData } from 'entities/User';
+    import { Navigate, useLocation } from 'react-router-dom';
+    import { RoutePath } from 'shared/config/routeConfig/routeConfig';
+
+    export function RequireAuth ({ children }: { children: JSX.Element }) {
+      const auth = useSelector(getUserAuthData);
+      const location = useLocation();
+
+      if (!auth) {
+        return <Navigate to={RoutePath.main} state={{ from: location }} replace />;
+      }
+
+      return children;
+    }
+
+Так же нужно доьвить в userSlice  _inited: false и все что с эти связанно, это типы, selector и так далее
+Так же в App.tsx
+
+    const App = () => {
+
+      const dispatch = useDispatch();
+      const inited = useSelector(getUserInited); // <<----добавили это!
+
+      useEffect(() => {
+        dispatch(userActions.initAuthData());
+      }, [dispatch]);
+
+      return (
+        <div className={classNames('app', {}, [])}>
+          <Suspense fallback="">
+            <Navbar/>
+            <div className="content-page">
+              <Sidebar/>
+              {inited && <AppRouter/>} / <<----добавили это!
+            </div>
+          </Suspense>
+        </div>
+      );
+    };
+
+
+Теперь все работает отлично!
