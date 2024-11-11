@@ -57,7 +57,7 @@ const article: Article = {
 
 export const Normal: Story = {
   args: {
-    id: '1'
+    id: article.id
   },
   decorators: [StoreDecorator({
     articleDetails: {
@@ -68,7 +68,7 @@ export const Normal: Story = {
 
 export const Loading: Story = {
   args: {
-    id: '1'
+    id: article.id
   },
   decorators: [StoreDecorator({
     articleDetails: {
@@ -79,7 +79,7 @@ export const Loading: Story = {
 
 export const Error: Story = {
   args: {
-    id: '1'
+    id: article.id
   },
   decorators: [StoreDecorator({
     articleDetails: {
