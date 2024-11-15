@@ -1,22 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Article } from 'entities/Article';
-import { ArticleDetails } from './ArticleDetails';
-import { StoreDecorator } from 'shared/config/storybook/StoreDecorator/StoreDecorator';
-import { ArticleBlockType, ArticleType } from 'entities/Article/model/types/article';
+import { Article, ArticleView } from '../../model/types/article';
+import { ArticleListItem } from './ArticleListItem';
 
 
 const meta = {
-  title: 'entities/ArticleDetails',
-  component: ArticleDetails,
+  title: 'entities/Article/ArticleListItem',
+  component: ArticleListItem,
   parameters: {
     layout: 'fullscreen',
   },
   argTypes: {},
-} satisfies Meta<typeof ArticleDetails>;
+} satisfies Meta<typeof ArticleListItem>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 
 const article = {
   id: '1',
@@ -99,35 +96,16 @@ const article = {
 } as Article;
 
 
-export const Normal: Story = {
+export const Big: Story = {
   args: {
-    id: article.id
+    view: ArticleView.BIG,
+    article,
   },
-  decorators: [StoreDecorator({
-    articleDetails: {
-      data: article,
-    },
-  })]
 };
 
-export const Loading: Story = {
+export const Small: Story = {
   args: {
-    id: article.id
+    view: ArticleView.SMALL,
+    article,
   },
-  decorators: [StoreDecorator({
-    articleDetails: {
-      isLoading: true,
-    },
-  })]
-};
-
-export const Error: Story = {
-  args: {
-    id: article.id
-  },
-  decorators: [StoreDecorator({
-    articleDetails: {
-      error: 'error',
-    },
-  })]
 };
