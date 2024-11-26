@@ -16,7 +16,7 @@ interface SelectProps {
     readonly?: boolean;
 }
 
-export const Select = memo((props: SelectProps) => {
+export const Select = (props: SelectProps) => {
   const {
     className,
     label,
@@ -61,4 +61,4 @@ export const Select = memo((props: SelectProps) => {
       </select>
     </div>
   );
-});
+};

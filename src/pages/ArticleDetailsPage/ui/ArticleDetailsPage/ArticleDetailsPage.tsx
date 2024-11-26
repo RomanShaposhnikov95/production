@@ -21,7 +21,7 @@ import {
   addCommentForArticle,
 } from '../../model/services/addCommentForArticle/addCommentForArticle';
 import { Button, ThemeButton } from 'shared/ui/Button/Button';
-import { Page } from 'shared/ui/Page/Page';
+import { Page } from 'widgets/Page/Page';
 
 interface ArticleDetailsPageProps {
     className?: string;

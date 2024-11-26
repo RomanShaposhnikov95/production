@@ -6,18 +6,17 @@ import {
 } from '@reduxjs/toolkit';
 import { ProfileSchema } from 'entities/Profile';
 import { AxiosInstance } from 'axios';
-import { NavigateOptions } from 'react-router';
-import { To } from 'react-router-dom';
 import { ArticleDetailsSchema } from 'entities/Article';
 import { ArticleDetailsCommentsSchema } from 'pages/ArticleDetailsPage';
 import { AddCommentFormSchema } from 'features/addCommentForm';
 import { ArticlesPageSchema } from 'pages/ArticlesPage';
+import { UISchema } from 'features/UI';
 
 
 export interface StateSchema {
     counter: CounterSchema;
     user: UserSchema;
-
+    ui: UISchema;
     // Асинхронные редюсеры
     loginForm?: LoginSchema;
     profile?: ProfileSchema;

@@ -2,3 +2,86 @@
 " navigate?: (to: To, options?: NavigateOptions) => void" так как мы особо его не юзаем и из за него у нас много раз создався новый стор.
 И так же мы разобрались с тем что у нас при переходе между страницами заново инициализировался редюсер даже если он уже проинициализирован.
 Мы добавили обьект mountedReducer и смотрели вмонтирован у нас уже reducer или нет.
+Для этого в папке app > providers > StoreProvider > config > reducerManager.ts
+
+    export function createReducerManager (initialReducers: ReducersMapObject<StateSchema>): ReducerManager {
+      const reducers = { ...initialReducers };
+
+      let combinedReducer = combineReducers(reducers);
+
+      let keysToRemove: Array<StateSchemaKey> = [];
+      const mountedReducers: MountedReducers = {}; // ++ добавили это
+
+      return {
+        getReducerMap: () => reducers,
+        getMountedReducers: () => mountedReducers,
+        // reduce: (state: StateSchema, action: UnknownAction) => {
+        reduce: (state: any, action: UnknownAction) => {
+          if (keysToRemove.length > 0) {
+            state = { ...state };
+            keysToRemove.forEach((key) => {
+              delete state[key];
+            });
+            keysToRemove = [];
+          }
+          return combinedReducer(state, action);
+        },
+        add: (key: StateSchemaKey, reducer: Reducer) => {
+          if (!key || reducers[key]) {
+            return;
+          }
+          reducers[key] = reducer;
+          mountedReducers[key] = true // ++ добавили это
+          combinedReducer = combineReducers(reducers);
+        },
+        remove: (key: StateSchemaKey) => {
+          if (!key || !reducers[key]) {
+            return;
+          }
+          delete reducers[key];
+          keysToRemove.push(key);
+          mountedReducers[key] = false; // ++ добавили это
+          combinedReducer = combineReducers(reducers);
+        },
+      };
+    }
+
+и в файле DynamicModuleLoader.tsx
+    export const DynamicModuleLoader: FC<DynamicModuleLoaderProps> = (props) => {
+      const {
+        children,
+        reducers,
+        removeAfterUnmount = true,
+      } = props;
+
+      const store = useStore() as ReduxStoreWithManager;
+      const dispatch = useDispatch();
+
+      useEffect(() => {
+        const mountedReducers = store.reducerManager.getMountedReducers(); // ++ добавили это
+        Object.entries(reducers).forEach(([name, reducer]) => {
+          const mounted = mountedReducers[name as StateSchemaKey]; // ++ добавили это
+          // Добавляем новый редюсер только если его нет
+          if (!mounted) { // ++ добавили это
+            store.reducerManager.add(name as StateSchemaKey, reducer);
+            dispatch({ type: `@INIT ${name} reducer` });
+          }
+        });
+
+        return () => {
+          if (removeAfterUnmount) {
+            Object.entries(reducers).forEach(([name, reducer]) => {
+              store.reducerManager.remove(name as StateSchemaKey);
+              dispatch({ type: `@DESTROY ${name} reducer` });
+            });
+          }
+        };
+        // eslint-disable-next-line
+        }, []);
+
+      return (
+        <>
+          {children}
+        </>
+      );
+    };
