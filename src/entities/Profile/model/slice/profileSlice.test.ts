@@ -1,6 +1,6 @@
 import {
   profileActions, profileReducer, ProfileSchema, updateProfileData, ValidateProfileError,
-} from 'entities/Profile';
+} from '../..';
 import { Country } from 'entities/Country';
 import { Currency } from 'entities/Currency';
 import { Action } from '@reduxjs/toolkit';

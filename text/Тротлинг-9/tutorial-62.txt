@@ -1,0 +1,51 @@
+Сейчас мы будем заливать наш сайт на бесплатный хостинг.
+Для начала, делаем npm run build:prod но ронимаем что у нас туда не попадают переводы. Так как они зранятся в папке public.
+Чтоб это исправить устанавливаем CopyWebpackPlugin командой npm install copy-webpack-plugin --save-dev.
+Затем в папке config > build > types > config.ts
+    export interface BuildPaths {
+        entry: string;
+        build: string;
+        html: string;
+        src: string;
+        locales: string  // <------ ++ добавили это!
+        buildLocales: string;
+    }
+
+Далее в корне webpack.config.ts
+     const paths: BuildPaths = {
+        entry: path.resolve(__dirname, 'src', 'index.tsx'),
+        build: path.resolve(__dirname, 'build'),
+        html: path.resolve(__dirname, 'public', 'index.html'),
+        src: path.resolve(__dirname, 'src'),
+        locales:  path.resolve(__dirname, 'public', 'locales'), // <------ ++ добавили это!
+        buildLocales:  path.resolve(__dirname, 'build', 'locales'), // <------ ++ добавили это!
+      }
+
+Далее в папке config > build > buildPlugins.ts и по туториалу CopyWebpackPlugin
+   const plugins = [
+       new webpack.ProgressPlugin(),
+       new HtmlWebpackPlugin({
+         template: paths.html
+       }),
+       new MiniCssExtractPlugin({
+         filename: 'css/[name].[contenthash:8].css',
+         chunkFilename: 'css/[name].[contenthash:8].css'
+       }),
+       new webpack.DefinePlugin({
+         __IS_DEV__: JSON.stringify(isDev),
+         __API__: JSON.stringify(apiUrl),
+         __PROJECT__: JSON.stringify(project)
+       }),
+       new CopyPlugin({
+         patterns: [
+           { from: paths.locales, to: paths.buildLocales },
+         ],
+       }), // <------ ++ добавили это!
+     ]
+
+
+И делаем npm run build:prod и теперь при сборке переводы должны попадать в папку build.
+
+Так же пройдемся по все .async и уберм искуственную задержку timeout так как они были добавлены в целях обучения.
+
+Далее лучше смотреть видео так как там показано как выложить сайт (Netlify)!

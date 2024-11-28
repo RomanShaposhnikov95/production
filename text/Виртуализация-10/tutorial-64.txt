@@ -1,9 +1,22 @@
+В этом уроке мы создадим свой плагин, который будет следить за импортами.
+Для начала создаем новый проект. Я назвал его custom-plugin там происываем  npm init -y.
+Чтобы создать плагин нужно много чего установить, но есть уже готовые решения.
+Для этоно гуглим - npm eslint plugin generator и первая ссылка! (https://www.npmjs.com/package/generator-eslint)
+Делаем все по туториалу.
+
+Далее npm login и npm publish.
+Если ругается на имя то чтоб заменить его "npm pkg set name="eslint-plugin-exapmle" // <--- любое имя?
+
+далее запускаем его в своем проекте!
+
+и добавляем в eslint.
+
 import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 import i18next from 'eslint-plugin-i18next';
-import example from 'eslint-plugin-exapmle'
+import example from 'eslint-plugin-exapmle' <----- Добавил это!
 
 
 export default [
@@ -26,7 +39,7 @@ export default [
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     plugins: {
       example
-    },
+    }, <----- Добавил это!
     rules: {
       'space-before-function-paren': ['error', 'always'], // Требовать пробел перед функцией
       'space-in-parens': ['error', 'never'], // Запрещать пробелы внутри круглых скобок
@@ -58,7 +71,7 @@ export default [
         { blankLine: 'always', prev: 'import', next: 'function' },
         { blankLine: 'always', prev: 'import', next: 'class' },
       ],
-      'example/path-checker': 'error'
+      'example/path-checker': 'error' <----- Добавил это!
     },
   },
   {
@@ -68,3 +81,5 @@ export default [
     }
   }// что бы в тестах выключить eslint на неперведенные слова
 ];
+
+В целом данный урок лучше смотреть в видео!

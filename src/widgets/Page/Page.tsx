@@ -18,6 +18,8 @@ interface PageProps {
     onScrollEnd?: () => void;
 }
 
+
+// eslint-disable-next-line react/display-name
 export const Page = memo((props: PageProps) => {
   const { className, children, onScrollEnd } = props;
   const wrapperRef = useRef() as MutableRefObject<HTMLDivElement>;
