@@ -80,5 +80,13 @@ export const SizeL: Story = {
   },
 };
 
+export const SizeS: Story = {
+  args: {
+    title: 'Title lorem ipsun',
+    text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit',
+    size: TextSize.S
+  },
+};
+
 
 
