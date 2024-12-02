@@ -1,0 +1,8 @@
+В этом уроке мы создали возможность через термиал созадавть структуру папок с файлами. что лучше понять открываем папау scripts > createSlice.
+Для запуска команды в терминале прописываем "node ./scripts/createSlice/index.js features testFeatures"
+1) features - название папки.
+2) testFeatures - может быть любое название.
+
+Что бы постоянно не прописывать node ./scripts/createSlice/index.js  - добавим ее в package.json
+"generate:slice": "node ./scripts/createSlice/index.js"
+и теперь можем в терминале ввести - npm run generate:slice pages userPage

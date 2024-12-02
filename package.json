@@ -17,7 +17,8 @@
     "build-storybook": "storybook build -c ./config/storybook",
     "test:ui": "npx loki test",
     "test:ui:ok": "npx loki approve",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate:slice": "node ./scripts/createSlice/index.js"
   },
   "keywords": [],
   "author": "",
