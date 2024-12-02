@@ -1,9 +1,9 @@
-import {
-  profileActions, profileReducer, ProfileSchema, updateProfileData, ValidateProfileError,
-} from '../..';
 import { Country } from 'entities/Country';
 import { Currency } from 'entities/Currency';
 import { Action } from '@reduxjs/toolkit';
+import { ProfileSchema, ValidateProfileError } from '../..';
+import { profileActions, profileReducer } from './profileSlice';
+import { updateProfileData } from '../services/updateProfileData/updateProfileData';
 
 const data = {
   username: 'admin',

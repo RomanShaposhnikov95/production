@@ -33,6 +33,8 @@ import {
 } from '../../model/services/fetchArticleRecommendations/fetchArticleRecommendations';
 import { ArticleDetailsPageHeader } from '../ArticleDetailsPageHeader/ArticleDetailsPageHeader';
 import { VStack } from 'shared/ui/Stack';
+import { ArticleRecommendationsList } from 'features/articleRecommendationsList';
+import { ArticleDetailsComments } from '../ArticleDetailsComments/ArticleDetailsComments';
 
 
 interface ArticleDetailsPageProps {
@@ -48,20 +50,6 @@ const ArticleDetailsPage = (props: ArticleDetailsPageProps) => {
   const { className } = props;
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const dispatch = useAppDispatch();
-  const recommendations = useSelector(getArticleRecommendations.selectAll);
-  const recommendationsIsLoading = useSelector(getArticleRecommendationsIsLoading);
-  const comments = useSelector(getArticleComments.selectAll);
-  const commentsIsLoading = useSelector(getArticleCommentsIsLoading);
-
-  const onSendComment = useCallback((text: string) => {
-    dispatch(addCommentForArticle(text));
-  }, [dispatch]);
-
-  useInitialEffect(() => {
-    dispatch(fetchCommentsByArticleId(id));
-    dispatch(fetchArticleRecommendations());
-  });
 
   if (!id) {
     return (
@@ -77,27 +65,8 @@ const ArticleDetailsPage = (props: ArticleDetailsPageProps) => {
         <VStack gap={'16'} max>
           <ArticleDetailsPageHeader />
           <ArticleDetails id={id} />
-          <Text
-            size={TextSize.L}
-            className={cls.commentTitle}
-            title={t('Рекомендуем')}
-          />
-          <ArticleList
-            articles={recommendations}
-            isLoading={recommendationsIsLoading}
-            className={cls.recommendations}
-            target="_blank"
-          />
-          <Text
-            size={TextSize.L}
-            className={cls.commentTitle}
-            title={t('Комментарии')}
-          />
-          <AddCommentForm onSendComment={onSendComment} />
-          <CommentList
-            isLoading={commentsIsLoading}
-            comments={comments}
-          />
+          <ArticleRecommendationsList />
+          <ArticleDetailsComments id={id} />
         </VStack>
       </Page>
     </DynamicModuleLoader>

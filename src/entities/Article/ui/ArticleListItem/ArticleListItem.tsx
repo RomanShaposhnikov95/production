@@ -26,11 +26,6 @@ interface ArticleListItemProps {
 export const ArticleListItem = memo((props: ArticleListItemProps) => {
   const { className, article, view, target } = props;
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const onOpenArticle = useCallback(() => {
-    navigate(RoutePath.article_details + article.id);
-  }, [article.id, navigate]);
 
   const types = <Text text={article.type.join(', ')} className={cls.types} />;
   const views = (
@@ -81,7 +76,7 @@ export const ArticleListItem = memo((props: ArticleListItemProps) => {
       to={RoutePath.article_details + article.id}
       className={classNames(cls.ArticleListItem, {}, [className, cls[view]])}
     >
-      <Card className={cls.card} onClick={onOpenArticle}>
+      <Card className={cls.card}>
         <div className={cls.imageWrapper}>
           <img alt={article.title} src={article.img} className={cls.img}/>
           <Text text={article.createdAt} className={cls.date}/>
