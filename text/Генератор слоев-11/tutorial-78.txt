@@ -1,0 +1,253 @@
+В этом уроке мы будем переезжаем на babel loader тем самым у нас ускорится сборка и так же избавемся от tsloader.
+в папке config > build > loaders > buildBabelLoaders.ts
+   было:
+        export function buildBabelLoader ({ isDev }: BuildOptions) {
+          return {
+            test: /\.(js|jsx|tsx)$/,
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env'],
+                plugins: [
+                  isDev && require.resolve('react-refresh/babel')
+                ].filter(Boolean)
+              }
+            }
+          }
+        }
+    стало:
+
+        interface BuildBabelLoaderProps extends BuildOptions {
+          isTsx?: boolean;
+        } <----- Добавили это!
+
+        export function buildBabelLoader ({ isDev, isTsx }: BuildBabelLoaderProps) {
+          return {
+            test: isTsx ? /\.(jsx|tsx)$/ : /\.(js|ts)$/, <----- Добавили это!
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env'],
+                plugins: [
+                  isDev && require.resolve('react-refresh/babel')
+                ].filter(Boolean)
+              }
+            }
+          }
+        }
+
+Далее гуглим plugin transform runtime и plugin transform typescript
+Устанавливаем:
+    npm install --save-dev @babel/plugin-transform-runtime
+    npm install --save-dev @babel/plugin-transform-typescript
+
+Далее по туториалу
+    export function buildBabelLoader ({ isDev, isTsx }: BuildBabelLoaderProps) {
+      return {
+        test: isTsx ? /\.(jsx|tsx)$/ : /\.(js|ts)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: [
+              [
+                '@babel/plugin-transform-typescript',
+                {
+                  isTsx
+                }
+              ], <----- Добавили это!
+              '@babel/plugin-transform-runtime', <----- Добавили это!
+              isDev && require.resolve('react-refresh/babel')
+            ].filter(Boolean)
+          }
+        }
+      }
+    }
+
+Далее в файле buildLoaders.ts
+    было
+
+    export function buildLoaders (options: BuildOptions): webpack.RuleSetRule[] {
+      const { isDev } = options
+
+      const svgLoader = {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
+      }
+
+      const babelLoader = buildBabelLoader(options)
+
+      const cssLoader = buildCssLoader(isDev);
+
+      const typescriptLoader = {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      }
+
+      const fileLoader = {
+        test: /\.(png|jpe?g|gif|woff2|woff)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      }
+
+      return [
+        fileLoader,
+        svgLoader,
+        babelLoader,
+        typescriptLoader,
+        cssLoader
+      ]
+    }
+
+    стало
+
+    export function buildLoaders (options: BuildOptions): webpack.RuleSetRule[] {
+      const { isDev } = options
+
+      const svgLoader = {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
+      }
+
+      const codeBabelLoader = buildBabelLoader({ ...options, isTsx: false }) //<----- Добавили это!
+      const tsxCodeBabelLoader = buildBabelLoader({ ...options, isTsx: true }) //<----- Добавили это!
+
+      const cssLoader = buildCssLoader(isDev);
+
+      // const typescriptLoader = {
+      //   test: /\.tsx?$/,
+      //   use: 'ts-loader',
+      //   exclude: /node_modules/,
+      // } //<----- Убрали!
+
+      const fileLoader = {
+        test: /\.(png|jpe?g|gif|woff2|woff)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      }
+
+      return [
+        fileLoader,
+        svgLoader,
+        codeBabelLoader, //<----- Добавили это!
+        tsxCodeBabelLoader, //<----- Добавили это!
+        // babelLoader,  //<----- Убрали!
+        // typescriptLoader,  //<----- Убрали!
+        cssLoader
+      ]
+    }
+
+
+Далее гуглим fork ts checker webpack plugin (https://www.npmjs.com/package/fork-ts-checker-webpack-plugin)
+и устанавливаем npm install --save-dev fork-ts-checker-webpack-plugin
+
+И добавляем в файл buildPlugins.ts
+    export function buildPlugins ({ paths, isDev, apiUrl, project }:BuildOptions): webpack.WebpackPluginInstance[] {
+      const plugins = [
+        new webpack.ProgressPlugin(),
+        new HtmlWebpackPlugin({
+          template: paths.html
+        }),
+        new MiniCssExtractPlugin({
+          filename: 'css/[name].[contenthash:8].css',
+          chunkFilename: 'css/[name].[contenthash:8].css'
+        }),
+        new webpack.DefinePlugin({
+          __IS_DEV__: JSON.stringify(isDev),
+          __API__: JSON.stringify(apiUrl),
+          __PROJECT__: JSON.stringify(project)
+        }),
+        new CopyPlugin({
+          patterns: [
+            { from: paths.locales, to: paths.buildLocales },
+          ],
+        }),
+        new CircularDependencyPlugin({
+          exclude: /node_modules/,
+          failOnError: true
+        }),
+        new ForkTsCheckerWebpackPlugin({
+          typescript: {
+            diagnosticOptions: {
+              semantic: true,
+              syntactic: true,
+            },
+            mode: 'write-references',
+          },
+        }), //<----- Добавили это!
+      ]
+
+  Благодоря ForkTsCheckerWebpackPlugin мы вынесли проверку ts отдельно в терминал
+
+Теперь подитожем теперь у нас за компиляцию тайпскипта отвечает babelLoader а от typescriptLoader мы отказались.
+
+
+
+Сейчас мы будем писать свой первый babel плагин. Для этого гуглим babel plugins development
+
+В папке config создаем папку babel > babelRemovePropsPlugins.ts
+
+    import { PluginItem } from '@babel/core';
+
+    export default function (): PluginItem {
+        return {
+            visitor: {
+                Program(path, state) {
+                    const forbidden = state.opts.props || [];
+
+                    path.traverse({
+                        JSXIdentifier(current) {
+                            const nodeName = current.node.name;
+
+                            if (forbidden.includes(nodeName)) {
+                                current.parentPath.remove();
+                            }
+                        },
+                    });
+                },
+            },
+        };
+    }
+
+далее мы в buildBabelLoader добавляем этот плагин.
+
+    export function buildBabelLoader ({ isDev, isTsx }: BuildBabelLoaderProps) {
+      return {
+        test: isTsx ? /\.(jsx|tsx)$/ : /\.(js|ts)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: [
+              [
+                '@babel/plugin-transform-typescript',
+                {
+                  isTsx
+                }
+              ],
+              '@babel/plugin-transform-runtime',
+              isTsx && [
+                babelRemovePropsPlugin,
+                {
+                  props: ['data-testid']
+                }
+              ], //<----- Добавили это!
+              isDev && require.resolve('react-refresh/babel')
+            ].filter(Boolean)
+          }
+        }
+      }
+    }
+
+Теперь при сборке npm run build:prod теперь в продакшн сборке у нас не будут попадать наши id которые мы сами прописывали для тестов
