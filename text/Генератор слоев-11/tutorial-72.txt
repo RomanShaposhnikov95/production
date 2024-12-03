@@ -1,0 +1,8 @@
+В этом уроке напишем тесты на EditableProfileCard.tsx.
+У нас они все падают и погунлив я понял что пробоема в библиотеке headlessui с обновлениями требует в jest указать.
+В папке config > jest > setupTests.ts
+    global.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    })) // <------ Добавили это +++ !

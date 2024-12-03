@@ -46,10 +46,6 @@ export const ProfileCard = (props: ProfileCardProps) => {
   } = props;
   const { t } = useTranslation('profile');
 
-  useEffect(() => {
-    console.log('data', data)
-  }, [data]);
-
   if (isLoading) {
     return (
       <HStack justify={'center'} max className={classNames(cls.ProfileCard, { [cls.loading]: true }, [className])}>
@@ -88,6 +84,7 @@ export const ProfileCard = (props: ProfileCardProps) => {
         className={cls.input}
         onChange={onChangeFirstname}
         readonly={readonly}
+        data-testid="ProfileCard.firstname"
       />
       <Input
         value={data?.lastname}
@@ -95,6 +92,7 @@ export const ProfileCard = (props: ProfileCardProps) => {
         className={cls.input}
         onChange={onChangeLastname}
         readonly={readonly}
+        data-testid="ProfileCard.lastname"
       />
       <Input
         value={data?.age}
@@ -130,12 +128,12 @@ export const ProfileCard = (props: ProfileCardProps) => {
         onChange={onChangeCurrency}
         readonly={readonly}
       />
-      <CountrySelect
-        className={cls.input}
-        value={data?.country}
-        onChange={onChangeCountry}
-        readonly={readonly}
-      />
+      {/*<CountrySelect*/}
+      {/*  className={cls.input}*/}
+      {/*  value={data?.country}*/}
+      {/*  onChange={onChangeCountry}*/}
+      {/*  readonly={readonly}*/}
+      {/*/>*/}
     </VStack>
   );
 };
