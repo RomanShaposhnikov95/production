@@ -1,0 +1,21 @@
+так как у нас итоговый бандл сильно раздувается так как он в себя включает babel loader и tsLoader.
+для этого гуглим tsconfig isolatedmodules.
+Далее в файл tsconfig.json
+     "compilerOptions": {
+        "outDir": "./dist/",
+        "noImplicitAny": true,
+        "module": "esnext",
+        "target": "es5",
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true, //// <---- Добавили это!
+        "baseUrl": ".",
+        "paths": {
+          "*": ["./src/*"]
+        },
+        "types": ["@testing-library/jest-dom", "node"]
+      },
