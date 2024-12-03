@@ -4,7 +4,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { Select, SelectOption } from 'shared/ui/Select/Select';
 import { SortOrder } from 'shared/types';
 import cls from './ArticleSortSelector.module.scss';
-import { ArticleSortField } from '../..';
+import { ArticleSortField } from '../../model/consts/articleConsts';
 
 interface ArticleSortSelectorProps {
     className?: string;
@@ -14,6 +14,7 @@ interface ArticleSortSelectorProps {
     onChangeSort: (newSort: ArticleSortField) => void;
 }
 
+// eslint-disable-next-line react/display-name
 export const ArticleSortSelector = memo((props: ArticleSortSelectorProps) => {
   const {
     className, onChangeOrder, onChangeSort, order, sort,
