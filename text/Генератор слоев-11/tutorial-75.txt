@@ -1,0 +1,40 @@
+Миграция на 18 реакт. Но у меня и так был 18 реакт. И установили npm install -D storybook-addon-mock
+Далее в config > storybook > main.ts
+     addons: [
+        '@storybook/addon-webpack5-compiler-swc',
+        '@storybook/addon-onboarding',
+        '@storybook/addon-links',
+        '@storybook/addon-essentials',
+        '@chromatic-com/storybook',
+        '@storybook/addon-interactions',
+        'storybook-addon-mock', //// <---- Добавили это!
+      ],
+
+Далее в config > storybook > webpack.config.ts
+     config!.plugins!.push(new DefinePlugin({
+        __IS_DEV__: JSON.stringify(true),
+        __API__: JSON.stringify('https://testapi.ru'), //// <---- Добавили url адрес!
+        __PROJECT__: JSON.stringify('storybook'),
+      }));
+
+Далее в ArticleRecommendationsList.stories.tsx
+   export const Normal: Story = {
+     args: {
+
+     },
+     parameters: {
+       mockData: [
+         {
+           url: `${__API__}/articles?_limit=3`,
+           method: 'GET',
+           status: 200,
+           response: [
+             { ...article, id: '1' },
+             { ...article, id: '2' },
+             { ...article, id: '3' },
+           ],
+         },
+       ],
+     }, //// <---- Добавили это!
+     decorators: [StoreDecorator({})]
+   };

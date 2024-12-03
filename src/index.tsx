@@ -9,6 +9,11 @@ import { ErrorBoundary } from 'app/providers/ErrorBoundary';
 import { StoreProvider } from 'app/providers/StoreProvider';
 
 const container = document.getElementById('root') as HTMLElement;
+
+if (!container) {
+  throw new Error('Контейнер root не найден. НЕ удалось вмонтировать реакт приложение');
+}
+
 const root = ReactDOM.createRoot(container);
 root.render(
   <React.StrictMode>
