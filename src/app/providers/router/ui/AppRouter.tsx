@@ -19,7 +19,7 @@ export const AppRouter = () => {
       <Route
         key={route.path}
         path={route.path}
-        element={route.authOnly ? <RequireAuth>{element}</RequireAuth> : element}
+        element={route.authOnly ? <RequireAuth roles={route.roles}>{element}</RequireAuth> : element}
       />
     )
   },[])
@@ -27,19 +27,6 @@ export const AppRouter = () => {
   return (
     <Routes>
       {Object.values(routeConfig).map(renderWithWrapper)}
-      {/*{routes.map(({ element, path }) => (*/}
-      {/*  <Route*/}
-      {/*    key={path}*/}
-      {/*    path={path}*/}
-      {/*    element={*/}
-      {/*      <Suspense fallback={<PageLoader/>}>*/}
-      {/*        <div className="page-wrapper">*/}
-      {/*          {element}*/}
-      {/*        </div>*/}
-      {/*      </Suspense>*/}
-      {/*    }*/}
-      {/*  />*/}
-      {/*))}*/}
     </Routes>
   );
 };
