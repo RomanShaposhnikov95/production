@@ -1,0 +1,13 @@
+Что бы делать свайпы нашего мобилтного drawer используем библиотеку use-gesture (https://use-gesture.netlify.app)
+npm install @use-gesture/react
+npm i @react-spring/web
+
+Так же мы научились подгружать библиотеки только в те компоненты где они нужны!
+Для примера смотреть Drawer и AnimationProvider
+
+    const getAsyncAnimationModules = async () => {
+      return Promise.all([
+        import('@react-spring/web'),
+        import('@use-gesture/react'),
+      ]);
+    };
