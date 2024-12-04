@@ -44,18 +44,8 @@
     }
 }
 
-.test_one {
-    background-color: #04ff04;
-    width: 200px;
-    height: 20px;
-}
-
-.test_two {
-    border: 3px solid red;
-    padding: 5px 10px;
-}
-
-.Big {
-    border: 3px solid yellow;
-    padding: 5px 10px;
+.isClosing {
+    .content {
+        transform: scale(0.2);
+    }
 }
