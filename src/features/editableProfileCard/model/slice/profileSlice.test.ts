@@ -1,7 +1,8 @@
-import { Country } from 'entities/Country';
-import { Currency } from 'entities/Currency';
+import { Country } from '@/entities/Country';
+import { Currency } from '@/entities/Currency';
 import { Action } from '@reduxjs/toolkit';
-import { ProfileSchema, ValidateProfileError } from '../..';
+import { ValidateProfileError } from '../../model/consts/consts';
+import { ProfileSchema } from '../types/editableProfileCardSchema';
 import { profileActions, profileReducer } from './profileSlice';
 import { updateProfileData } from '../services/updateProfileData/updateProfileData';
 

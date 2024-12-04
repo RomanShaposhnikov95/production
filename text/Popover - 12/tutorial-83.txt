@@ -1,0 +1,79 @@
+Добавляем alias к путям
+в папке config > build > buildResolver.ts
+    export function buildResolvers (options: BuildOptions): webpack.ResolveOptions {
+      return {
+        extensions: ['.tsx', '.ts', '.js'],
+        preferAbsolute: true,
+        modules: [options.paths.src, 'node_modules'],
+        mainFiles: ['index'], // для каждого модуля index будет главным файлом
+        alias: {
+          '@': options.paths.src
+        } // <--- Добавили это!
+      }
+    }
+
+
+в корне tsconfig.json
+     "compilerOptions": {
+        "outDir": "./dist/",
+        "noImplicitAny": true,
+        "module": "esnext",
+        "target": "es5",
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "baseUrl": ".",
+        "paths": {
+          "@*": ["./src/*"] // <--- Добавили @
+        },
+        "types": ["@testing-library/jest-dom", "node"]
+      },
+      "ts-node": {
+        "compilerOptions": {
+          "module": "CommonJS"
+        },
+      },
+      "include": [
+        "./config/jest/setupTests.ts",
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
+      ]
+    }
+
+
+Теперь во всех путях ошибка и чтоб каждый путь не менять отдельно, автоматизируем.
+Гуглим ts morph (https://ts-morph.com/)
+Устанавливаем npm install --save-dev ts-morph
+В папке scripts создаем файл updateImports.ts
+    import { Project } from 'ts-morph';
+
+    const project = new Project({});
+
+    project.addSourceFilesAtPaths('src/**/*.ts');
+    project.addSourceFilesAtPaths('src/**/*.tsx');
+
+    const files = project.getSourceFiles();
+
+    function isAbsolute(value: string) {
+        const layers = ['app', 'shared', 'entities', 'features', 'widgets', 'pages'];
+        return layers.some((layer) => value.startsWith(layer));
+    }
+
+    files.forEach((sourceFile) => {
+        const importDeclarations = sourceFile.getImportDeclarations();
+        importDeclarations.forEach((importDeclaration) => {
+            const value = importDeclaration.getModuleSpecifierValue();
+
+            if (isAbsolute(value)) {
+                importDeclaration.setModuleSpecifier(`@/${value}`);
+            }
+        });
+    });
+
+    project.save();
+
+И запускаем скрипт - ts-node ./scripts/updateImports.ts

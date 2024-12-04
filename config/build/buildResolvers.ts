@@ -7,6 +7,8 @@ export function buildResolvers (options: BuildOptions): webpack.ResolveOptions {
     preferAbsolute: true,
     modules: [options.paths.src, 'node_modules'],
     mainFiles: ['index'], // для каждого модуля index будет главным файлом
-    alias: {}
+    alias: {
+      '@': options.paths.src
+    }
   }
 }
