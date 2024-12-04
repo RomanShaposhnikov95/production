@@ -1,0 +1,9 @@
+Гуглим browser list (https://github.com/browserslist/browserslist)
+В корне создаем .browserlistrc
+
+    # Browsers that we support
+
+    defaults
+    not IE 11
+
+И теперь браузер IE 11 не будет поддерживаться
