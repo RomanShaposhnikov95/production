@@ -1,0 +1,90 @@
+Настраиваем vite (https://stackblitz.com/edit/vitejs-vite-zzepkk?file=package.json&terminal=dev)
+npm i @vitejs/plugin-react vite --save-dev
+В корне создаем файл vite.config.ts
+
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+
+    // https://vite.dev/config/
+    export default defineConfig({
+      plugins: [react()],
+    })
+
+Из папки public копируем index.html и вставляем в корень проекта
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+    </head>
+    <body>
+
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script> // <------ Добавили это!
+    </body>
+    </html>
+
+И в package.json добавляем  "start:vite": "vite",
+И запускаем но у нас падает ошибка
+     @/app/providers/ThemeProvider (imported by /Users/roman/Desktop/webpack/src/index.tsx)
+      @/app/styles/index.scss (imported by /Users/roman/Desktop/webpack/src/index.tsx)
+      @/app/providers/ErrorBoundary (imported by /Users/roman/Desktop/webpack/src/index.tsx)
+
+Так как он не знает что это за библиотека а это мы сами добавили это функционал с алиасами
+Чтоб исправить
+    // https://vite.dev/config/
+    export default defineConfig({
+      plugins: [react()],
+      resolve: {
+        alias: [
+          { find: '@', replacement: '/src' } /// <---Добавили это!!
+        ]
+      }
+    })
+
+Так же как и в webpack прокиним переменные
+    export default defineConfig({
+      plugins: [react()],
+      resolve: {
+        alias: [
+          { find: '@', replacement: '/src' }
+        ]
+      },
+    define: {
+      __IS_DEV__: JSON.stringify(true),
+      __API__: JSON.stringify('http://localhost:8000'),
+      __PROJECT__: JSON.stringify('frontend')
+    }  /// <---Добавили это!!
+    })
+
+И плюсом устанавливаем npm i vite-plugin-svgr --save-dev чтоб работали svg
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+    import svgr from 'vite-plugin-svgr' <---Добавили это!!
+
+    // https://vite.dev/config/
+    export default defineConfig({
+      plugins: [
+          svgr({
+            svgrOptions: { exportType: 'default', ref: true, svgo: false, titleProp: true },
+            include: '**/*.svg',
+          }), <---Добавили это!!
+        react()
+      ],
+      resolve: {
+        alias: [
+          { find: '@', replacement: '/src' }
+        ]
+      },
+      define: {
+        __IS_DEV__: JSON.stringify(true),
+        __API__: JSON.stringify('http://localhost:8000'),
+        __PROJECT__: JSON.stringify('frontend')
+      }
+    })
+
+И теперь npm run start:dev:vite
+И все работает в dev режиме быстрее
