@@ -10,6 +10,7 @@ interface ArticleTextBlockComponentProps {
     block: ArticleTextBlock;
 }
 
+// eslint-disable-next-line react/display-name
 export const ArticleTextBlockComponent = memo((props: ArticleTextBlockComponentProps) => {
   const { className, block } = props;
   const { t } = useTranslation();

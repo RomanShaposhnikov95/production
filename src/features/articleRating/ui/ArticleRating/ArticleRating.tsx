@@ -11,16 +11,18 @@ export interface ArticleRatingProps {
     articleId: string;
 }
 
-// eslint-disable-next-line react/display-name
 const ArticleRating = memo((props: ArticleRatingProps) => {
   const { className, articleId } = props;
   const { t } = useTranslation();
   const userData = useSelector(getUserAuthData);
 
+  // console.log(t('Язык'))
+
   const { data, isLoading } = useGetArticleRating({
     articleId,
     userId: userData?.id ?? '',
   });
+
   const [rateArticleMutation] = useRateArticle();
 
   const handleRateArticle = useCallback((starsCount: number, feedback?: string) => {
@@ -44,6 +46,7 @@ const ArticleRating = memo((props: ArticleRatingProps) => {
   const onCancel = useCallback((starsCount: number) => {
     handleRateArticle(starsCount);
   }, [handleRateArticle]);
+
 
   if (isLoading) {
     return <Skeleton width="100%" height={120} />;

@@ -1,17 +1,19 @@
-// import React from 'react';
-// import { ComponentStory, ComponentMeta } from '@storybook/react';
-//
-// import { RatingCard } from './RatingCard';
-//
-// export default {
-//     title: 'shared/RatingCard',
-//     component: RatingCard,
-//     argTypes: {
-//         backgroundColor: { control: 'color' },
-//     },
-// } as ComponentMeta<typeof RatingCard>;
-//
-// const Template: ComponentStory<typeof RatingCard> = (args) => <RatingCard {...args} />;
-//
-// export const Normal = Template.bind({});
-// Normal.args = {};
+import type { Meta, StoryObj } from '@storybook/react';
+import { RatingCard } from './RatingCard';
+
+const meta = {
+  title: 'shared/RatingCard',
+  component: RatingCard,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  argTypes: {},
+} satisfies Meta<typeof RatingCard>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+
+export const Normal: Story = {
+  args: {},
+};

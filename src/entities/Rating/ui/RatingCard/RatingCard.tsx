@@ -21,7 +21,6 @@ interface RatingCardProps {
     rate?: number;
 }
 
-// eslint-disable-next-line react/display-name
 export const RatingCard = memo((props: RatingCardProps) => {
   const {
     className,

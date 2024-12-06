@@ -10,12 +10,12 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 
 
-export function buildPlugins ({ paths, isDev, apiUrl, project }:BuildOptions): webpack.WebpackPluginInstance[] {
+export function buildPlugins ({ paths, isDev, apiUrl, project }: BuildOptions): webpack.WebpackPluginInstance[] {
   const plugins = [
-    new webpack.ProgressPlugin(),
     new HtmlWebpackPlugin({
       template: paths.html
     }),
+    new webpack.ProgressPlugin(),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:8].css',
       chunkFilename: 'css/[name].[contenthash:8].css'

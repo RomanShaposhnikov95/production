@@ -4,11 +4,8 @@ import { userReducer } from '@/entities/User';
 import { StateSchema, ThunkExtraArg } from './StateSchema';
 import { createReducerManager } from '@/app/providers/StoreProvider/config/reducerManager';
 import { $api } from '@/shared/api/api';
-import { To } from 'react-router-dom';
-import { NavigateOptions } from 'react-router';
 import { uiReducer } from '@/features/UI';
 import { rtkApi } from '@/shared/api/rtkApi';
-// import { CombinedState } from 'redux';
 
 export function createReduxStore (
   initialState?: StateSchema,

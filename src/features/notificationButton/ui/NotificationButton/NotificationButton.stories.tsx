@@ -1,17 +1,20 @@
-// import React from 'react';
-// import { ComponentStory, ComponentMeta } from '@storybook/react';
-//
-// import { NotificationButton } from './NotificationButton';
-//
-// export default {
-//     title: 'shared/NotificationButton',
-//     component: NotificationButton,
-//     argTypes: {
-//         backgroundColor: { control: 'color' },
-//     },
-// } as ComponentMeta<typeof NotificationButton>;
-//
-// const Template: ComponentStory<typeof NotificationButton> = (args) => <NotificationButton {...args} />;
-//
-// export const Normal = Template.bind({});
-// Normal.args = {};
+import type { Meta, StoryObj } from '@storybook/react';
+import { NotificationButton } from './NotificationButton';
+
+
+const meta = {
+  title: 'shared/NotificationButton',
+  component: NotificationButton,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  argTypes: {},
+} satisfies Meta<typeof NotificationButton>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+
+export const Normal: Story = {
+  args: {},
+};

@@ -1,17 +1,20 @@
-// import React from 'react';
-// import { ComponentStory, ComponentMeta } from '@storybook/react';
-//
-// import { AvatarDropdown } from './AvatarDropdown';
-//
-// export default {
-//     title: 'shared/AvatarDropdown',
-//     component: AvatarDropdown,
-//     argTypes: {
-//         backgroundColor: { control: 'color' },
-//     },
-// } as ComponentMeta<typeof AvatarDropdown>;
-//
-// const Template: ComponentStory<typeof AvatarDropdown> = (args) => <AvatarDropdown {...args} />;
-//
-// export const Normal = Template.bind({});
-// Normal.args = {};
+import type { Meta, StoryObj } from '@storybook/react';
+import { AvatarDropdown } from './AvatarDropdown';
+
+
+const meta = {
+  title: 'features/AvatarDropdown',
+  component: AvatarDropdown,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  argTypes: {},
+} satisfies Meta<typeof AvatarDropdown>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+
+export const Normal: Story = {
+  args: {},
+};

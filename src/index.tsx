@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './app/App';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/app/providers/ThemeProvider';
@@ -14,17 +14,15 @@ if (!container) {
   throw new Error('Контейнер root не найден. НЕ удалось вмонтировать реакт приложение');
 }
 
-const root = ReactDOM.createRoot(container);
+const root = createRoot(container);
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <StoreProvider>
-        <ErrorBoundary>
-          <ThemeProvider>
-            <App/>
-          </ThemeProvider>
-        </ErrorBoundary>
-      </StoreProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <StoreProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <App/>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </StoreProvider>
+  </BrowserRouter>
 );

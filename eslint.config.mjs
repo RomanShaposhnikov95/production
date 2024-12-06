@@ -58,7 +58,8 @@ export default [
         { blankLine: 'always', prev: 'import', next: 'function' },
         { blankLine: 'always', prev: 'import', next: 'class' },
       ],
-      'example/path-checker': 'error'
+      'example/path-checker': 'error',
+      "react/display-name": "off",
     },
   },
   {

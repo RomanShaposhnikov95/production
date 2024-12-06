@@ -12,7 +12,6 @@ interface CommentListProps {
     isLoading?: boolean;
 }
 
-// eslint-disable-next-line react/display-name
 export const CommentList = memo((props: CommentListProps) => {
   const { className, isLoading, comments } = props;
   const { t } = useTranslation();

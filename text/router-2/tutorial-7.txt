@@ -1,1 +1,4 @@
 это просто вводный урок!
+
+чтоб не было много рендеров нужно установить эти версии npm install i18next@^21.9.0 i18next-browser-languagedetector@^6.1.3 react-i18next@^11.18.3 eslint-plugin-i18next@^5.1.2
+а это новые npm install i18next@^23.14.0 i18next-browser-languagedetector@^8.0.0 react-i18next@^15.0.1 eslint-plugin-i18next@^6.1.0

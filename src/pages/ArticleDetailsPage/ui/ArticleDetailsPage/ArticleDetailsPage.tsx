@@ -11,7 +11,8 @@ import { ArticleDetailsPageHeader } from '../ArticleDetailsPageHeader/ArticleDet
 import { VStack } from '@/shared/ui/Stack';
 import { ArticleRecommendationsList } from '@/features/articleRecommendationsList';
 import { ArticleDetailsComments } from '../ArticleDetailsComments/ArticleDetailsComments';
-import { ArticleRatingAsync } from '@/features/articleRating/ui/ArticleRating/ArticleRating.async';
+import { ArticleRating } from '@/features/articleRating';
+
 
 
 interface ArticleDetailsPageProps {
@@ -19,19 +20,18 @@ interface ArticleDetailsPageProps {
 }
 
 const reducers: ReducersList = {
-  // articleDetailsComments: articleDetailsCommentsReducer,
   articleDetailsPage: articleDetailsPageReducer,
 };
 
 const ArticleDetailsPage = (props: ArticleDetailsPageProps) => {
   const { className } = props;
-  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
   if (!id) {
     return null;
   }
 
+  console.log('RENDER-id', id)
 
   return (
     <DynamicModuleLoader reducers={reducers} removeAfterUnmount>
@@ -39,7 +39,7 @@ const ArticleDetailsPage = (props: ArticleDetailsPageProps) => {
         <VStack gap={'16'} max>
           <ArticleDetailsPageHeader />
           <ArticleDetails id={id} />
-          <ArticleRatingAsync articleId={id} />
+          <ArticleRating articleId={id} />
           <ArticleRecommendationsList />
           <ArticleDetailsComments id={id} />
         </VStack>
