@@ -1,13 +1,13 @@
 import { classNames } from '@/shared/lib/classNames/classNames';
 import { useTranslation } from 'react-i18next';
-import { Button, ThemeButton } from '@/shared/ui/Button/Button';
-import { Input } from '@/shared/ui/Input/Input';
+import { Button, ThemeButton } from '@/shared/ui/Button';
+import { Input } from '@/shared/ui/Input';
 import cls from './LoginForm.module.scss';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { loginByUsername } from '../../model/services/loginByUsername/loginByUsername';
 import { loginActions, loginReducer } from '../../model/slice/loginSlice';
 import { memo, useCallback, useEffect } from 'react';
-import { Text, TextTheme } from '@/shared/ui/Text/Text';
+import { Text, TextTheme } from '@/shared/ui/Text';
 import { AppDispatch } from '@/app/providers/StoreProvider/config/store';
 import { ReduxStoreWithManager } from '@/app/providers/StoreProvider/config/StateSchema';
 import { getLoginUsername } from '../../model/selectors/getLoginUsername/getLoginUsername';

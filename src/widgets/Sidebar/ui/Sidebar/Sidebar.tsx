@@ -1,7 +1,7 @@
 import cls from './Sidebar.module.scss';
 import React, { useMemo, useState } from 'react';
 import { classNames } from '@/shared/lib/classNames/classNames';
-import { Button, ButtonSize, ThemeButton } from '@/shared/ui/Button/Button';
+import { Button, ButtonSize, ThemeButton } from '@/shared/ui/Button';
 import { SidebarItem } from '../SidebarItem/SidebarItem';
 import { useSelector } from 'react-redux';
 import { getSidebarItems } from '../../model/selectors/getSidebarItems';

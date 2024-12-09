@@ -1,0 +1,4 @@
+В папке scriots мы создали файл createPublicApiForSharedUi.ts
+Этот файл для тоно чтоб если в папке shared ui у нас в компоненте нет файла index.ts
+то он его создаст
+запускаем командой ts-node ./scripts/refactoring/createPublicApiForSharedUi.ts
