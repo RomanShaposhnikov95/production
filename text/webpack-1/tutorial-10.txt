@@ -4,11 +4,11 @@
     1)entities
         1)providers
             1)router
-                index.ts - пустой файл
+                sort.ts - пустой файл
             2)ThemeProvider
                 1) lib
                 2) ui
-                3) index.ts
+                3) sort.ts
         2)styles
         3)types
         App.tsx
@@ -89,15 +89,15 @@ export interface BuildPaths {
         1)ui
           AboutPage.async.tsx
             AboutPage.tsx
-        2) index.ts
+        2) sort.ts
      1) MainPage
         1)ui
           MainPage.async.tsx
             MainPage.tsx
-        2) index.ts
+        2) sort.ts
 
 
-        index.ts  выглядет так :
+        sort.ts  выглядет так :
 
         export {AboutPageAsync as AboutPage} from "./ui/AboutPage.async";
          export {MainPageAsync as MainPage} from "./ui/MainPage.async";

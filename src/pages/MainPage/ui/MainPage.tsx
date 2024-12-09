@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Counter } from '@/entities/Counter';
 import { RatingCard } from '@/entities/Rating';
-import { StarRating } from '@/shared/ui/StarRating';
+import { Page } from '@/widgets/Page';
 
 const MainPage = () => {
   const { t } = useTranslation('main');
@@ -12,7 +12,7 @@ const MainPage = () => {
   }
 
   return (
-    <div>
+    <Page data-testid="MainPage">
       {t('Главная страница')}
       <Counter/>
       <RatingCard
@@ -20,7 +20,7 @@ const MainPage = () => {
         feedbackTitle={'feedbackTitle'}
         hasFeedback={true}
       />
-    </div>
+    </Page>
   );
 };
 
