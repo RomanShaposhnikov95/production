@@ -1,0 +1,7 @@
+В этом уроке добавили в jest.config.ts
+     moduleNameMapper: {
+        '\\.(s?css)$': 'identity-obj-proxy',
+        '\\.svg': path.resolve(__dirname, 'jestEmptyComponent.tsx'),
+        '^@/(.*)$:': '<rootDir>/src/$1', // <---- Это добавили!
+      },
+Это для того чтоб тесты могли находить путь импользуя alias "@"

@@ -10,9 +10,6 @@ import { Theme } from '@/shared/const/theme';
 const meta = {
   title: 'pages/ProfilePage',
   component: ProfilePage,
-  parameters: {
-    layout: 'fullscreen',
-  },
   argTypes: {
 
   },

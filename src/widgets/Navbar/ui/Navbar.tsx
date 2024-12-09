@@ -11,7 +11,7 @@ import { TextTheme, Text } from '@/shared/ui/Text';
 import { HStack } from '@/shared/ui/Stack';
 import { NotificationButton } from '@/features/notificationButton';
 import { AvatarDropdown } from '@/features/avatarDropdown';
-import { RoutePath } from '@/shared/const/router';
+import {getRouteArticleCreate} from '@/shared/const/router';
 
 interface NavbarProps {
     className?: string;
@@ -33,12 +33,6 @@ export const Navbar = ({ className }: NavbarProps) => {
     setIsAuthModal(true);
   }, []);
 
-  const onLogout = useCallback(() => {
-    dispatch(userActions.logout());
-  }, [dispatch]);
-
-  const isAdminPanelAvailable = isAdmin || isManager;
-
   if (authData) {
     return (
       <header className={classNames(cls.Navbar, {}, [className])}>
@@ -48,7 +42,7 @@ export const Navbar = ({ className }: NavbarProps) => {
           theme={TextTheme.INVERTED}
         />
         <AppLink
-          to={RoutePath.article_create}
+          to={getRouteArticleCreate()}
           theme={AppLinkTheme.SECONDARY}
           className={cls.createBtn}
         >
