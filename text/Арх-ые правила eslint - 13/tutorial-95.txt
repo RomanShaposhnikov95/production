@@ -1,0 +1,1 @@
+установили плагин для неиспользованных импортов npm install eslint-plugin-unused-imports --save-dev

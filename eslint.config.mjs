@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 // import i18next from 'eslint-plugin-i18next';
 import example from 'eslint-plugin-exapmle'
+import unusedImports from "eslint-plugin-unused-imports";
 
 
 export default [
@@ -21,11 +22,13 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
+
   // i18next.configs['flat/recommended'],
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     plugins: {
-      example
+      example,
+      "unused-imports": unusedImports,
     },
     rules: {
       'space-before-function-paren': ['error', 'always'], // Требовать пробел перед функцией
@@ -60,6 +63,7 @@ export default [
       ],
       'example/path-checker': ['error', { alias: '@' }],
       "react/display-name": "off",
+      "unused-imports/no-unused-imports": "error",
     },
   },
   {
