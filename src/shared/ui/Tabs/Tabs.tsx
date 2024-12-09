@@ -15,7 +15,7 @@ interface TabsProps {
     onTabClick: (tab: TabItem) => void;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const Tabs = memo((props: TabsProps) => {
   const {
     className, tabs, onTabClick, value,

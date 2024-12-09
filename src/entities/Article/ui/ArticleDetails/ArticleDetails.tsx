@@ -34,7 +34,7 @@ const reducers: ReducersList = {
   articleDetails: articleDetailsReducer,
 };
 
-// eslint-disable-next-line react/display-name
+
 export const ArticleDetails = memo((props: ArticleDetailsProps) => {
   const { className, id } = props;
   const { t } = useTranslation();

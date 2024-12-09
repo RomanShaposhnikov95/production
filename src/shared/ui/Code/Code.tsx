@@ -9,7 +9,7 @@ interface CodeProps {
     text: string;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const Code = memo((props: CodeProps) => {
   const { className, text } = props;
 

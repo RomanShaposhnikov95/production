@@ -695,6 +695,12 @@
       "userId": "1",
       "text": "123",
       "id": "KmtWJR_"
+    },
+    {
+      "articleId": "7",
+      "userId": "1",
+      "text": "rgrgre",
+      "id": "ipRIt_5"
     }
   ],
   "users": [
@@ -805,6 +811,13 @@
       "articleId": "5",
       "rate": 3,
       "id": "KBf03Pe"
+    },
+    {
+      "userId": "1",
+      "articleId": "11",
+      "rate": 3,
+      "feedback": "efwgwe",
+      "id": "keqY6Cd"
     }
   ],
   "profile-ratings": [

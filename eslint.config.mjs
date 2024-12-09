@@ -2,7 +2,7 @@ import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
-import i18next from 'eslint-plugin-i18next';
+// import i18next from 'eslint-plugin-i18next';
 import example from 'eslint-plugin-exapmle'
 
 
@@ -21,7 +21,7 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  i18next.configs['flat/recommended'],
+  // i18next.configs['flat/recommended'],
   {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     plugins: {
@@ -58,14 +58,14 @@ export default [
         { blankLine: 'always', prev: 'import', next: 'function' },
         { blankLine: 'always', prev: 'import', next: 'class' },
       ],
-      'example/path-checker': 'error',
+      'example/path-checker': ['error', { alias: '@' }],
       "react/display-name": "off",
     },
   },
   {
     files: ['**/src/**/*.test.{ts,tsx}'],
     rules: {
-      'i18next/no-literal-string': 'off'
+      // 'i18next/no-literal-string': 'off'
     }
   }// что бы в тестах выключить eslint на неперведенные слова
 ];

@@ -22,7 +22,7 @@ const getSkeletons = (view: ArticleView) => new Array(view === ArticleView.SMALL
     <ArticleListItemSkeleton className={cls.card} key={index} view={view} />
   ));
 
-// eslint-disable-next-line react/display-name
+
 export const ArticleList = memo((props: ArticleListProps) => {
   const {
     className,

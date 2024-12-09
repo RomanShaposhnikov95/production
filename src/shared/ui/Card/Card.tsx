@@ -14,7 +14,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
     max?: boolean;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const Card = memo((props: CardProps) => {
   const { className, children, theme = CardTheme.NORMAL, max, ...otherProps } = props;
 

@@ -10,7 +10,7 @@ interface ArticleImageBlockComponentProps {
     block: ArticleImageBlock;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const ArticleImageBlockComponent = memo((props: ArticleImageBlockComponentProps) => {
   const { className, block } = props;
   const { t } = useTranslation();

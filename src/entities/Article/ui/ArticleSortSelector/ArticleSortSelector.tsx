@@ -14,7 +14,7 @@ interface ArticleSortSelectorProps {
     onChangeSort: (newSort: ArticleSortField) => void;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const ArticleSortSelector = memo((props: ArticleSortSelectorProps) => {
   const {
     className, onChangeOrder, onChangeSort, order, sort,

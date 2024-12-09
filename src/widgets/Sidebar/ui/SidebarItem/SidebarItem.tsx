@@ -12,7 +12,7 @@ interface SidebarItemProps {
     collapsed: boolean;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const SidebarItem = memo(({ item, collapsed }: SidebarItemProps) => {
   const { t } = useTranslation();
   const isAuth = useSelector(getUserAuthData);

@@ -14,7 +14,7 @@ interface NotificationButtonProps {
     className?: string;
 }
 
-// eslint-disable-next-line react/display-name
+
 export const NotificationButton = memo((props: NotificationButtonProps) => {
   const { className } = props;
   const [isOpen, setIsOpen] = useState(false);

@@ -1,0 +1,4 @@
+В этом уроке мы создали второй плагин который запрещает нарушать метеолонию и физически запретит ломать инкапсуляцию
+в наших модулях. А точнее нужно всегда содержимое папки выносить в index.ts
+Было: import { LangSwitcher } from '@widgets/LangSwitcher/ui/LangSwitcher';
+Стало: import {LangSwitcher} from "@widgets/LangSwitcher";

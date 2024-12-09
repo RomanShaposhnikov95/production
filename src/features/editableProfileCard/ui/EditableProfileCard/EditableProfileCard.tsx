@@ -29,7 +29,7 @@ const reducers: ReducersList = {
   profile: profileReducer,
 };
 
-// eslint-disable-next-line react/display-name
+
 export const EditableProfileCard = memo((props: EditableProfileCardProps) => {
   const { className, id } = props;
   const { t } = useTranslation('profile');

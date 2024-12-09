@@ -25,7 +25,7 @@ const viewTypes = [
   },
 ];
 
-// eslint-disable-next-line react/display-name
+
 export const ArticleViewSelector = memo((props: ArticleViewSelectorProps) => {
   const { className, view, onViewClick } = props;
 

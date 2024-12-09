@@ -18,7 +18,7 @@ const options = [
   { value: Currency.USD, content: Currency.USD },
 ];
 
-// eslint-disable-next-line react/display-name
+
 export const CurrencySelect = memo(({
   className, value, onChange, readonly,
 }: CurrencySelectProps) => {
