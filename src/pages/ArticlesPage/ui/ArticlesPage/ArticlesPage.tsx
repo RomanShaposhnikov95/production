@@ -1,6 +1,6 @@
 import { classNames } from '@/shared/lib/classNames/classNames';
 import { useTranslation } from 'react-i18next';
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback } from 'react';
 import cls from './ArticlesPage.module.scss';
 import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch';
 import { useInitialEffect } from '@/shared/lib/hooks/useInitialEffect/useInitialEffect';
@@ -29,6 +29,9 @@ const ArticlesPage = (props: ArticlesPageProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
+  // const articleItem = useArticleItemById('2')
+  //
+  // console.log('articleItem', articleItem)
 
   const onLoadNextPart = useCallback(() => {
     dispatch(fetchNextArticlesPage());

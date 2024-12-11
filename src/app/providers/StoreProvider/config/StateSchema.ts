@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
 import { ArticleDetailsSchema } from '@/entities/Article';
-import { ArticleDetailsCommentsSchema, ArticleDetailsPageSchema, } from '@/pages/ArticleDetailsPage';
+import { ArticleDetailsPageSchema, } from '@/pages/ArticleDetailsPage';
 import { AddCommentFormSchema } from '@/features/addCommentForm';
 import { ArticlesPageSchema } from '@/pages/ArticlesPage';
 import { UISchema } from '@/features/UI';
