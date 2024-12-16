@@ -4,6 +4,12 @@
 @use "themes/dark";
 @use "themes/orange";
 
+
+.test {
+  color: var(--test-color);
+  font-size: 30px;
+}
+
 .app,
 .app_modal,
 .app_drawer {

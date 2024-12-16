@@ -13,3 +13,4 @@ export const Loader = ({ className }: LoaderProps) => (
     <div />
   </div>
 );
+

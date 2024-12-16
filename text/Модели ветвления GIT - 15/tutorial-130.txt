@@ -1,0 +1,3 @@
+поменяли логику кода ToggleFeatures.ts и так же remove-feature.ts потому что иеперь мы удаляем из jsx дерева, а наш страый код не мог с этим работать!
+Но лучше потом вникнуть что да как! в package.json добавили "remove-feature": "ts-node ./scripts/remove-feature.ts"
+И теперь мы можем удалять старый код " npm run remove-feature isArticleRatingEnabled on" // isArticleRatingEnabled on - любая компонента!
