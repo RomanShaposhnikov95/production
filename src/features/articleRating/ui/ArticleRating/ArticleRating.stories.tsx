@@ -4,7 +4,7 @@ import ArticleRating from './ArticleRating';
 import { StoreDecorator } from '@/shared/config/storybook/StoreDecorator/StoreDecorator';
 
 const meta = {
-  title: 'features/ArticleRating',
+  title: 'features/≈≈',
   component: ArticleRating,
   parameters: {
     layout: 'fullscreen',

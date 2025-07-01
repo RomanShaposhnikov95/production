@@ -8,7 +8,6 @@ import { Loader } from '@/shared/ui/Loader';
 import { Currency, CurrencySelect } from '@/entities/Currency';
 import { Country, CountrySelect } from '@/entities/Country';
 import { Avatar } from '@/shared/ui/Avatar';
-import { useEffect } from 'react';
 import { HStack, VStack } from '@/shared/ui/Stack';
 
 

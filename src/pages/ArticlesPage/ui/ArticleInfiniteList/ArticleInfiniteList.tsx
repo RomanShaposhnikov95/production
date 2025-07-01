@@ -21,7 +21,6 @@ export const ArticleInfiniteList = memo((props: ArticleInfiniteListProps) => {
   const view = useSelector(getArticlesPageView);
   const error = useSelector(getArticlesPageError);
   const { t } = useTranslation();
-
   if (error) {
     return <Text text={t('Ошибка при загрузке статей')} />;
   }

@@ -1,5 +1,5 @@
 Что бы делать свайпы нашего мобилтного drawer используем библиотеку use-gesture (https://use-gesture.netlify.app)
-npm install @use-gesture/react
+npm i @use-gesture/react
 npm i @react-spring/web
 
 Так же мы научились подгружать библиотеки только в те компоненты где они нужны!
